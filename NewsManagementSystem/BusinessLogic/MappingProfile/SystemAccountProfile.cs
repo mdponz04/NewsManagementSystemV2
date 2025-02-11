@@ -2,13 +2,15 @@
 using Data.Entities;
 using Repositories.DTOs.SystemAccountDTOs;
 
-namespace Repositories.MappingProfile
+namespace BusinessLogic.MappingProfile
 {
     public class SystemAccountProfile : Profile
     {
-        public SystemAccountProfile() 
+        public SystemAccountProfile()
         {
             CreateMap<SystemAccount, GetSystemAccountDTO>().ReverseMap();
+            CreateMap<SystemAccount, PostSystemAccountDTO>().ReverseMap();
+            CreateMap<SystemAccount, PutSystemAccountDTO>().ReverseMap();
         }
     }
 }

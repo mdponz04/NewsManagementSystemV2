@@ -7,6 +7,13 @@ namespace BusinessLogic.Interfaces
     public interface ISystemAccountService
     {
         Task<PaginatedList<GetSystemAccountDTO>> GetUserAccounts(int index, int pageSize, int? idSearch, string? nameSearch, string? emailSearch, EnumRole? role);
-        Task<PaginatedList<GetSystemAccountDTO>> GetUserAccounts(object index, object pageSize, object idSearch, object nameSearch, object emailSearch, object role);
+
+        Task<GetSystemAccountDTO> GetUserAccountById(short id);
+
+        Task CreateUserAccount(PostSystemAccountDTO postSystemAccount);
+
+        Task UpdateUserAccountById(PutSystemAccountDTO updatedUserAccount);
+
+        Task DeleteUserAccountById(short id);
     }
 }

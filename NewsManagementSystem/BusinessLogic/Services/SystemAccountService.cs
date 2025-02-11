@@ -5,6 +5,7 @@ using Data.Entities;
 using Data.Enum;
 using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Repositories.DTOs.SystemAccountDTOs;
 using Repositories.Interface;
 using Repositories.PaggingItem;
@@ -15,16 +16,15 @@ namespace BusinessLogic.Services
     {
         private readonly IMapper _mapper;
         private readonly IUOW _unitOfWork;
-        private readonly IHttpContextAccessor _contextAccessor;
 
-        private const int _staff = 1;
-        private const int _lecturer = 2;
+        private const int STAFF = 1;
+        private const int LECTURER = 2;
+        private const int STARTING_NUMBER = 0;
 
-        public SystemAccountService(IMapper mapper, IUOW unitOfWork, IHttpContextAccessor contextAccessor)
+        public SystemAccountService(IMapper mapper, IUOW unitOfWork)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
-            _contextAccessor = contextAccessor;
         }
 
         // Get list of system user
@@ -32,7 +32,7 @@ namespace BusinessLogic.Services
         {
             if (index <= 0 || pageSize <= 0)
             {
-                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Vui lòng nhập số trang hợp lệ");
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Please input index or page size correctly!");
             }
 
             IQueryable<SystemAccount> query = _unitOfWork.GetRepository<SystemAccount>().Entities;
@@ -58,11 +58,11 @@ namespace BusinessLogic.Services
             // Search by role
             switch (role)
             {
-                case (EnumRole?)_staff:
-                    query = query.Where(u => u.AccountRole == _staff);
+                case (EnumRole?)STAFF:
+                    query = query.Where(u => u.AccountRole == STAFF);
                     break;
-                case (EnumRole?)_lecturer:
-                    query = query.Where(u => u.AccountRole == _lecturer);
+                case (EnumRole?)LECTURER:
+                    query = query.Where(u => u.AccountRole == LECTURER);
                     break;
                 default:
                     break;
@@ -78,6 +78,8 @@ namespace BusinessLogic.Services
             {
                 GetSystemAccountDTO responseItem = _mapper.Map<GetSystemAccountDTO>(item);
 
+                responseItem.RoleName = item.AccountRole == STAFF ? "Staff" : "Lecturer"; 
+
                 return responseItem;
             }).ToList();
 
@@ -89,6 +91,125 @@ namespace BusinessLogic.Services
                 );
 
             return paginatedList;
+        }
+
+        // Get 1 user account by id
+        public async Task<GetSystemAccountDTO> GetUserAccountById(short id)
+        {
+            IQueryable<SystemAccount> query = _unitOfWork.GetRepository<SystemAccount>().Entities;
+
+            SystemAccount? user = await query.Where(u => u.AccountId == id).FirstOrDefaultAsync();
+
+            // Validate user
+            if (user == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "User not found!");
+            }
+
+            // Mapping user entities to dto
+            GetSystemAccountDTO responseItem = _mapper.Map<GetSystemAccountDTO>(user);
+
+            responseItem.RoleName = user.AccountRole == STAFF ? "Staff" : "Lecturer";
+
+            return responseItem;
+        }
+
+        // Update User Info
+        public async Task UpdateUserAccountById(PutSystemAccountDTO updatedUserAccount)
+        {
+            IQueryable<SystemAccount> query = _unitOfWork.GetRepository<SystemAccount>().Entities;
+
+            SystemAccount? user = await query.Where(u => u.AccountId == updatedUserAccount.AccountId).FirstOrDefaultAsync();
+
+            // Validate user
+            if (user == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "User not found!");
+            }
+
+            // Validate Account Email
+            if (string.IsNullOrWhiteSpace(updatedUserAccount.AccountEmail) || (!updatedUserAccount.AccountEmail.Contains("@") || updatedUserAccount.AccountEmail.Count(c => c == '@') > 1))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Invalid Account Email");
+            }
+
+            _mapper.Map(updatedUserAccount, user);
+            //user.AccountName = updatedUserAccount.AccountName;
+            //user.AccountEmail = updatedUserAccount.AccountEmail;
+
+            await _unitOfWork.GetRepository<SystemAccount>().UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+        }
+
+        // Delete User
+        public async Task DeleteUserAccountById(short id)
+        {
+            IQueryable<SystemAccount> query = _unitOfWork.GetRepository<SystemAccount>().Entities;
+
+            SystemAccount? user = await query.Where(u => u.AccountId == id).FirstOrDefaultAsync();
+
+            // Validate user
+            if (user == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "User not found!");
+            }
+
+            await _unitOfWork.GetRepository<SystemAccount>().DeleteAsync(user);
+            await _unitOfWork.SaveAsync();
+        }
+
+        public async Task CreateUserAccount(PostSystemAccountDTO postSystemAccount)
+        {
+            // Validate Account Name
+            if (string.IsNullOrWhiteSpace(postSystemAccount.AccountName))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Invalid Account Name");
+            }
+
+            // Validate Account Email
+            if (string.IsNullOrWhiteSpace(postSystemAccount.AccountEmail) || (!postSystemAccount.AccountEmail.Contains("@") || postSystemAccount.AccountEmail.Count(c => c == '@') > 1))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Invalid Account Email");
+            }
+
+            // Validate Account Name
+            if (string.IsNullOrWhiteSpace(postSystemAccount.AccountPassword))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Invalid Password");
+            }
+
+            // Validate Account Name
+            if (!postSystemAccount.AccountPassword.Equals(postSystemAccount.ConfirmedPassword))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Password not matched");
+            }
+
+            // Mapping user dto to entities
+            SystemAccount newUser = _mapper.Map<SystemAccount>(postSystemAccount);
+
+            // Get Id with biggest number
+            int maxId = await _unitOfWork.GetRepository<SystemAccount>()
+                                        .Entities
+                                        .MaxAsync(u => (short?)u.AccountId) ?? STARTING_NUMBER;
+
+            // Add new account id
+            newUser.AccountId = (short)(maxId + 1);
+
+            // Add role to account
+            switch (postSystemAccount.Role)
+            {
+                case EnumRole.Staff:
+                    newUser.AccountRole = STAFF;
+                    break;
+                case EnumRole.Lecturer:
+                    newUser.AccountRole = LECTURER;
+                    break;
+                default:
+                    throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Invalid Role");
+            }
+
+            await _unitOfWork.GetRepository<SystemAccount>().InsertAsync(newUser);
+            await _unitOfWork.SaveAsync();
         }
     }
 }

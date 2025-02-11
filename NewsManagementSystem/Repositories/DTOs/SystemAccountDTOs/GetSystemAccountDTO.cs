@@ -2,7 +2,7 @@
 {
     public class GetSystemAccountDTO : BaseSystemAccountDTO
     {
-        public int AccountId { get; set; }
+        public short AccountId { get; set; }
         public string RoleName { get; set; } = string.Empty;
     }
 }

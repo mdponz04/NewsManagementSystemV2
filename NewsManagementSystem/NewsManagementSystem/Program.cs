@@ -1,5 +1,9 @@
+using BusinessLogic.Interfaces;
+using BusinessLogic.Services;
 using Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using BusinessLogic;
+using NewsManagementSystem.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +17,7 @@ var connectionString = builder.Configuration.GetConnectionString("MyCnn");
 builder.Services.AddDbContext<NewsManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+builder.Services.AddApplication(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,6 +30,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseMiddleware<CustomExceptionHandlerMiddleware>();
 
 app.UseRouting();
 

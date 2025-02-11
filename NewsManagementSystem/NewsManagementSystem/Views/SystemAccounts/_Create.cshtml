@@ -1,12 +1,6 @@
 ﻿@using Data.Enum
 @model Repositories.DTOs.SystemAccountDTOs.PostSystemAccountDTO
 
-@{
-    ViewData["Title"] = "Create";
-}
-
-<h1>Create</h1>
-
 <form asp-action="Create" method="post" id="createAccountForm">
     <div class="form-group">
         <label asp-for="AccountName">Name</label>
@@ -28,23 +22,7 @@
         <label asp-for="ConfirmedPassword">Confirm Password</label>
         <input asp-for="ConfirmedPassword" type="password" class="form-control" />
     </div>
+
     <button type="submit" class="btn btn-success">Create</button>
+    <button type="button" class="btn btn-secondary" onclick="location.href='@Url.Action("Index", "SystemAccounts")'">Cancel</button>
 </form>
-
-<script>
-    $('#createAccountForm').submit(function (event) {
-        event.preventDefault();
-        $.post('/SystemAccounts/Create', $(this).serialize(), function () {
-            $('#createModal').modal('hide');
-            location.reload(); // Reload to update table
-        });
-    });
-</script>
-
-<div>
-    <a class="btn btn-secondary" asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Data.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
 using Repositories.DTOs.SystemAccountDTOs;
 using Repositories.PaggingItem;
-using System.Data;
-using System.Drawing.Printing;
 using BusinessLogic.Interfaces;
 
 namespace NewsManagementSystem.Controllers
@@ -17,54 +8,35 @@ namespace NewsManagementSystem.Controllers
     public class SystemAccountsController : Controller
     {
         private readonly ISystemAccountService _systemAccountService;
-        private readonly NewsManagementDbContext _context;
 
-        public SystemAccountsController(NewsManagementDbContext context, ISystemAccountService systemAccountService)
+        public SystemAccountsController(ISystemAccountService systemAccountService)
         {
-            _context = context;
             _systemAccountService = systemAccountService;
         }
 
         // GET: SystemAccounts
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3)
         {
-            try
-            {
+
                 // Fetch paginated user accounts
-                PaginatedList<GetSystemAccountDTO> userAccounts = await _systemAccountService.GetUserAccounts(1, 10, null, null, null, null);
+                PaginatedList<GetSystemAccountDTO> userAccounts = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, null, null, null);
 
                 // Pass data to the view
                 return View(userAccounts);
-            }
-            catch (Exception ex)
-            {
-                ViewData["ErrorMessage"] = "Error fetching user accounts: " + ex.Message;
-                return View();
-            }
         }
 
         // GET: SystemAccounts/Details/5
-        public async Task<IActionResult> Details(short? id)
+        public async Task<IActionResult> Profile(short id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            GetSystemAccountDTO userAccount = await _systemAccountService.GetUserAccountById(id);
 
-            var systemAccount = await _context.SystemAccounts
-                .FirstOrDefaultAsync(m => m.AccountId == id);
-            if (systemAccount == null)
-            {
-                return NotFound();
-            }
-
-            return View(systemAccount);
+            return View(userAccount);
         }
 
         // GET: SystemAccounts/Create
         public IActionResult Create()
         {
-            return View();
+            return PartialView("_Create", new PostSystemAccountDTO());
         }
 
         // POST: SystemAccounts/Create
@@ -72,31 +44,27 @@ namespace NewsManagementSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AccountId,AccountName,AccountEmail,AccountRole,AccountPassword")] SystemAccount systemAccount)
+        public async Task<IActionResult> Create(PostSystemAccountDTO systemAccount)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(systemAccount);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                await _systemAccountService.CreateUserAccount(systemAccount);
+                TempData["SuccessMessage"] = "User created successfully!";
+                return RedirectToAction("Index");
             }
-            return View(systemAccount);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error: " + ex.Message;
+                return RedirectToAction("Index");
+            }
         }
 
         // GET: SystemAccounts/Edit/5
-        public async Task<IActionResult> Edit(short? id)
+        public async Task<IActionResult> Edit(short id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            GetSystemAccountDTO userAccount = await _systemAccountService.GetUserAccountById(id);
 
-            var systemAccount = await _context.SystemAccounts.FindAsync(id);
-            if (systemAccount == null)
-            {
-                return NotFound();
-            }
-            return View(systemAccount);
+            return PartialView("_Edit", userAccount);
         }
 
         // POST: SystemAccounts/Edit/5
@@ -104,52 +72,27 @@ namespace NewsManagementSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(short id, [Bind("AccountId,AccountName,AccountEmail,AccountRole,AccountPassword")] SystemAccount systemAccount)
+        public async Task<IActionResult> Edit(PutSystemAccountDTO systemAccount)
         {
-            if (id != systemAccount.AccountId)
+            try
             {
-                return NotFound();
+                await _systemAccountService.UpdateUserAccountById(systemAccount);
+                TempData["SuccessMessage"] = "User updated successfully!";
+                return RedirectToAction("Profile", new { id = systemAccount.AccountId });
             }
-
-            if (ModelState.IsValid)
+            catch (Exception ex)
             {
-                try
-                {
-                    _context.Update(systemAccount);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SystemAccountExists(systemAccount.AccountId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                TempData["ErrorMessage"] = "Error: " + ex.Message;
                 return RedirectToAction(nameof(Index));
             }
-            return View(systemAccount);
         }
 
         // GET: SystemAccounts/Delete/5
-        public async Task<IActionResult> Delete(short? id)
+        public async Task<IActionResult> Delete(short id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            GetSystemAccountDTO userAccount = await _systemAccountService.GetUserAccountById(id);
 
-            var systemAccount = await _context.SystemAccounts
-                .FirstOrDefaultAsync(m => m.AccountId == id);
-            if (systemAccount == null)
-            {
-                return NotFound();
-            }
-
-            return View(systemAccount);
+            return View(userAccount);
         }
 
         // POST: SystemAccounts/Delete/5
@@ -157,19 +100,19 @@ namespace NewsManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(short id)
         {
-            var systemAccount = await _context.SystemAccounts.FindAsync(id);
-            if (systemAccount != null)
+            try
             {
-                _context.SystemAccounts.Remove(systemAccount);
+                await _systemAccountService.DeleteUserAccountById(id);
+                TempData["SuccessMessage"] = "User deleted successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error" + ex.Message;
+                throw;
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
-        private bool SystemAccountExists(short id)
-        {
-            return _context.SystemAccounts.Any(e => e.AccountId == id);
-        }
     }
 }
