@@ -32,14 +32,11 @@ namespace NewsManagementSystem.Controllers
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            try
-            {
-                return Ok(new { message = "Logout successful" });
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized(new { message = ex.Message });
-            }
+            // Remove JWT from local storage or session
+            HttpContext.Session.Remove("jwt_token"); // Or use other methods as needed
+
+            // Redirect to the Home page or Login page
+            return RedirectToAction("Index", "Home");
         }
 
 
