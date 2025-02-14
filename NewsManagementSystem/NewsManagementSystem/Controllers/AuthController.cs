@@ -6,7 +6,7 @@ namespace NewsManagementSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : Controller
     {
         private readonly ISystemAccountService _systemAccountService;
 
@@ -22,6 +22,19 @@ namespace NewsManagementSystem.Controllers
             {
                 var token = await _systemAccountService.Login(loginDTO);
                 return Ok(new { token });
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            try
+            {
+                return Ok(new { message = "Logout successful" });
             }
             catch (Exception ex)
             {
