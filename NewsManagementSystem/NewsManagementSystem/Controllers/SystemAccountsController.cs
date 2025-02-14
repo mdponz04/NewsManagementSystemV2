@@ -2,13 +2,11 @@
 using Repositories.DTOs.SystemAccountDTOs;
 using Repositories.PaggingItem;
 using BusinessLogic.Interfaces;
+using Data.Enum;
 using Microsoft.AspNetCore.Authorization;
 
 namespace NewsManagementSystem.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
     public class SystemAccountsController : Controller
     {
         private readonly ISystemAccountService _systemAccountService;
@@ -30,7 +28,6 @@ namespace NewsManagementSystem.Controllers
         }
 
         // GET: SystemAccounts/Details/5
-        [HttpGet("profile")]
         public async Task<IActionResult> Profile(short id)
         {
             GetSystemAccountDTO userAccount = await _systemAccountService.GetUserAccountById(id);
@@ -119,12 +116,21 @@ namespace NewsManagementSystem.Controllers
 
         }
 
-        [Authorize]
-        [HttpGet("profile")]
-        public async Task<IActionResult> GetProfile()
+
+        // GET: Search SystemAccounts
+        public async Task<IActionResult> Search(int pageNumber = 1, int pageSize = 3, string? searchString = null)
         {
-            var user = await _systemAccountService.GetUserAccountById(short.Parse(User.Identity.Name));
-            return Ok(user);
+
+            // Fetch paginated user accounts
+            PaginatedList<GetSystemAccountDTO> userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchString, null, null);
+
+            if (userAccountsSearch == null)
+            {
+                userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, null, searchString, null);
+            }
+
+            // Pass data to the view
+            return View("Index", userAccountsSearch);
         }
 
 

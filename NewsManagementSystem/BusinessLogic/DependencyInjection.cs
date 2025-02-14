@@ -56,5 +56,7 @@ public static class DependencyInjection
 
         services.AddAuthorization();
 
+        services.AddScoped<ITagService, TagService>();
+        services.AddScoped<ICategoryService, CategoryService>();
     }
 }

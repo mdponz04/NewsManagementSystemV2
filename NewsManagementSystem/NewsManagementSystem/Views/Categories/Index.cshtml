@@ -1,59 +1,52 @@
-﻿@model Repositories.PaggingItem.PaginatedList<Repositories.DTOs.SystemAccountDTOs.GetSystemAccountDTO>
-
+﻿@model Repositories.PaggingItem.PaginatedList<Repositories.DTOs.CategoryDTOs.GetCategoryDTO>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
 <form asp-action="Search" method="get" class="mb-5">
     <label for="nameSearch">Search:</label>
-    <input type="text" id="searchString" name="searchString" placeholder="Enter name...">
-
-
+    <input type="text" id="searchString" name="searchString" placeholder="Enter search...">
     <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
-
     <button type="submit">Search</button>
 </form>
 
-
-<button type="button" class="btn btn-primary" onclick="loadCreateForm()">Create Account</button>
-
+<h1>Index</h1>
 <table class="table">
     <thead>
         <tr>
             <th>
-                FullName
+                Category Name
             </th>
             <th>
-                Email
+                Category Description
             </th>
             <th>
-                Role
+                Active
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Items) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoleName)
-            </td>
-            <td>
-                <button class="btn btn-warning" onclick="loadEditForm(@item.AccountId)">Edit</button> |
-                <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.AccountId">Profile</a> |
-                <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.AccountId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryDescription)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+                <td>
+                    <button class="btn btn-warning" onclick="loadEditForm(@item.CategoryId)">Edit</button> |
+                    <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.CategoryId">Profile</a> |
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 <div>
@@ -107,14 +100,14 @@
 
 <script>
     function loadCreateForm() {
-        $.get('/SystemAccounts/Create', function (data) {
+        $.get('/Categories/Create', function (data) {
             $('#createFormContainer').html(data);
             $('#createModal').modal('show');
         });
     }
 
     function loadEditForm(id) {
-        $.get('/SystemAccounts/Edit/' + id, function (data) {
+        $.get('/Categories/Edit/' + id, function (data) {
             $('#editFormContainer').html(data);
             $('#editModal').modal('show');
         });
@@ -122,7 +115,7 @@
 
     $(document).on("submit", "#createAccountForm", function (event) {
         event.preventDefault();
-        $.post('/SystemAccounts/Create', $(this).serialize(), function () {
+        $.post('/Categories/Create', $(this).serialize(), function () {
             $('#createModal').modal('hide');
             location.reload();
         });
@@ -130,9 +123,10 @@
 
     $(document).on("submit", "#editAccountForm", function (event) {
         event.preventDefault();
-        $.post('/SystemAccounts/Edit', $(this).serialize(), function () {
+        $.post('/Categories/Edit', $(this).serialize(), function () {
             $('#editModal').modal('hide');
             location.reload();
         });
     });
 </script>
+
