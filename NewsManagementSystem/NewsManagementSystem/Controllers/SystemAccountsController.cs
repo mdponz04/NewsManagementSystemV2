@@ -3,6 +3,7 @@ using Repositories.DTOs.SystemAccountDTOs;
 using Repositories.PaggingItem;
 using BusinessLogic.Interfaces;
 using Data.Enum;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NewsManagementSystem.Controllers
 {
@@ -131,6 +132,7 @@ namespace NewsManagementSystem.Controllers
             // Pass data to the view
             return View("Index", userAccountsSearch);
         }
+
 
     }
 }
