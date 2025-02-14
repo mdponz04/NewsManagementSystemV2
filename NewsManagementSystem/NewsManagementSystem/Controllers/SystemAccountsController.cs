@@ -2,6 +2,7 @@
 using Repositories.DTOs.SystemAccountDTOs;
 using Repositories.PaggingItem;
 using BusinessLogic.Interfaces;
+using Data.Enum;
 
 namespace NewsManagementSystem.Controllers
 {
@@ -112,6 +113,23 @@ namespace NewsManagementSystem.Controllers
                 throw;
             }
 
+        }
+
+
+        // GET: Search SystemAccounts
+        public async Task<IActionResult> Search(int pageNumber = 1, int pageSize = 3, string? searchString = null)
+        {
+
+            // Fetch paginated user accounts
+            PaginatedList<GetSystemAccountDTO> userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchString, null, null);
+
+            if (userAccountsSearch == null)
+            {
+                userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, null, searchString, null);
+            }
+
+            // Pass data to the view
+            return View("Index", userAccountsSearch);
         }
 
     }
