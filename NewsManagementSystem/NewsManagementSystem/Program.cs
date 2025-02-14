@@ -34,7 +34,8 @@ app.UseMiddleware<CustomExceptionHandlerMiddleware>();
 
 app.UseRouting();
 
-app.UseAuthorization();
+app.UseAuthentication(); // Enables authentication
+app.UseAuthorization();  // Enables authorization
 
 app.MapControllerRoute(
     name: "default",

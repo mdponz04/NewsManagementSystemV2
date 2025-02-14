@@ -2,9 +2,13 @@
 using Repositories.DTOs.SystemAccountDTOs;
 using Repositories.PaggingItem;
 using BusinessLogic.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NewsManagementSystem.Controllers
 {
+    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
     public class SystemAccountsController : Controller
     {
         private readonly ISystemAccountService _systemAccountService;
@@ -26,6 +30,7 @@ namespace NewsManagementSystem.Controllers
         }
 
         // GET: SystemAccounts/Details/5
+        [HttpGet("profile")]
         public async Task<IActionResult> Profile(short id)
         {
             GetSystemAccountDTO userAccount = await _systemAccountService.GetUserAccountById(id);
@@ -113,6 +118,15 @@ namespace NewsManagementSystem.Controllers
             }
 
         }
+
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var user = await _systemAccountService.GetUserAccountById(short.Parse(User.Identity.Name));
+            return Ok(user);
+        }
+
 
     }
 }
