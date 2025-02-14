@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewsManagementSystem.Models;
 
@@ -28,5 +29,13 @@ namespace NewsManagementSystem.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [Authorize] 
+        public IActionResult SecurePage()
+        {
+
+            return View("SecurePage");
+        }
+
     }
 }

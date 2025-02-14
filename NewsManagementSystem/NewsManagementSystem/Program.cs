@@ -10,6 +10,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add logging
+builder.Services.AddLogging(config =>
+{
+    config.AddConsole(); 
+    config.AddDebug();   
+});
+
 // Get connection string from appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("MyCnn");
 
@@ -33,6 +40,27 @@ app.UseStaticFiles();
 app.UseMiddleware<CustomExceptionHandlerMiddleware>();
 
 app.UseRouting();
+
+// Add logging middleware
+app.Use(async (context, next) =>
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+    // Log incoming request details (method, path, headers, etc.)
+    logger.LogInformation($"Request Method: {context.Request.Method}");
+    logger.LogInformation($"Request Path: {context.Request.Path}");
+    logger.LogInformation($"Request Headers: {string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}: {h.Value}"))}");
+
+    // Log JWT token if present in the header
+    var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+    if (!string.IsNullOrWhiteSpace(token))
+    {
+        logger.LogInformation($"JWT Token: {token}");
+    }
+    
+    await next.Invoke();
+});
+
 
 app.UseAuthentication(); // Enables authentication
 app.UseAuthorization();  // Enables authorization

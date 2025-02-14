@@ -222,17 +222,15 @@ namespace BusinessLogic.Services
 
         public async Task<string> Login(LoginDTO loginDTO)
         {
-            // Fetch the user from the database by email
             var user = await _unitOfWork.GetRepository<SystemAccount>()
                 .Entities
                 .FirstOrDefaultAsync(u => u.AccountEmail == loginDTO.AccountEmail);
 
             if (user == null || loginDTO.AccountPassword != user.AccountPassword)
             {
-                throw new ErrorException(StatusCodes.Status401Unauthorized, "401","Invalid credentials");
+                throw new ErrorException(StatusCodes.Status401Unauthorized, "401", "Invalid credentials");
             }
 
-            // Generate JWT token if authentication is successful
             var token = GenerateJwtToken(user);
             return token;
         }
@@ -240,12 +238,12 @@ namespace BusinessLogic.Services
         private string GenerateJwtToken(SystemAccount user)
         {
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.AccountId.ToString()),
-                new Claim(ClaimTypes.Name, user.AccountName),
-                new Claim(ClaimTypes.Email, user.AccountEmail),
-                new Claim(ClaimTypes.Role, user.AccountRole.ToString())
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.AccountId.ToString()),
+        new Claim(ClaimTypes.Name, user.AccountName),
+        new Claim(ClaimTypes.Email, user.AccountEmail),
+        new Claim(ClaimTypes.Role, user.AccountRole.ToString())
+    };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
