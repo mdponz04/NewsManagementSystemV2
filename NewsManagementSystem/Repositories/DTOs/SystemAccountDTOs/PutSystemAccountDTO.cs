@@ -2,6 +2,6 @@
 {
     public class PutSystemAccountDTO : BaseSystemAccountDTO
     {
-        public short AccountId { get; set; }
+        public int AccountId { get; set; }
     }
 }

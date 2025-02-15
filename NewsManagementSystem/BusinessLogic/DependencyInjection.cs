@@ -34,6 +34,8 @@ public static class DependencyInjection
     public static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ISystemAccountService, SystemAccountService>();
-
+        services.AddScoped<ITagService, TagService>();
+        services.AddScoped<INewsArticleService, NewsArticleService>();
     }
+
 }

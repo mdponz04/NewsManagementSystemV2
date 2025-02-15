@@ -41,6 +41,7 @@ namespace BusinessLogic.Services
             if (idSearch.HasValue)
             {
                 query = query.Where(u => u.AccountId == idSearch);
+           
             }
 
             // Search by user name
