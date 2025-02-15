@@ -1,4 +1,4 @@
-﻿@model Data.Entities.NewsArticle
+﻿@model Repositories.DTOs.NewsArticleDTOs.GetNewsArticleDTO
 
 @{
     ViewData["Title"] = "Delete";
@@ -47,29 +47,12 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.NewsStatus)
         </dd>
+        
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedById)
+            @Html.DisplayNameFor(model => model.ModifyDate)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedById)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ModifiedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ModifiedDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.CategoryDesciption)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedBy.AccountId)
+            @Html.DisplayFor(model => model.ModifyDate)
         </dd>
     </dl>
     

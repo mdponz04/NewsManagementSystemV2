@@ -9,6 +9,7 @@ namespace BusinessLogic.Interfaces
         Task<string> CreateNewsArticle(PostNewsArticleDTO newsArticle);
         Task UpdateNewsArticle(PutNewsArticleDTO updatedNewsArticle);
         Task DeleteNewsArticle(string id);
+        Task InactiveNewsArticle(string id);
         Task<List<GetNewsArticleDTO>> GetActiveNewsArticle();
         Task<List<GetNewsArticleDTO>> GetNewsArticleAccordingToCreateById(short createById);
     }

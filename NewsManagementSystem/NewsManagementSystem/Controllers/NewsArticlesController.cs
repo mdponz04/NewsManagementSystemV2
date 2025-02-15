@@ -61,9 +61,9 @@ namespace NewsManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PostNewsArticleDTO newsArticle)
         {
-            await _newsArticleService.CreateNewsArticle(newsArticle);
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryDesciption", newsArticle.CategoryId);
-            return View(newsArticle);
+            string id = await _newsArticleService.CreateNewsArticle(newsArticle);
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: NewsArticles/Edit/5
@@ -74,13 +74,12 @@ namespace NewsManagementSystem.Controllers
                 return NotFound();
             }
 
-            var newsArticle = await _context.NewsArticles.FindAsync(id);
+            var newsArticle = await _newsArticleService.GetNewsArticleById(id);
             if (newsArticle == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryDesciption", newsArticle.CategoryId);
-            ViewData["CreatedById"] = new SelectList(_context.SystemAccounts, "AccountId", "AccountId", newsArticle.CreatedById);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", newsArticle.CategoryId);
             return View(newsArticle);
         }
 
@@ -89,36 +88,16 @@ namespace NewsManagementSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("NewsArticleId,NewsTitle,Headline,CreatedDate,NewsContent,NewsSource,CategoryId,NewsStatus,CreatedById,UpdatedById,ModifiedDate")] NewsArticle newsArticle)
+        public async Task<IActionResult> Edit(string id, PutNewsArticleDTO newsArticle)
         {
             if (id != newsArticle.NewsArticleId)
             {
                 return NotFound();
             }
+            await _newsArticleService.UpdateNewsArticle(newsArticle);
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(newsArticle);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NewsArticleExists(newsArticle.NewsArticleId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryDesciption", newsArticle.CategoryId);
-            ViewData["CreatedById"] = new SelectList(_context.SystemAccounts, "AccountId", "AccountId", newsArticle.CreatedById);
-            return View(newsArticle);
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: NewsArticles/Delete/5
@@ -129,10 +108,7 @@ namespace NewsManagementSystem.Controllers
                 return NotFound();
             }
 
-            var newsArticle = await _context.NewsArticles
-                .Include(n => n.Category)
-                .Include(n => n.CreatedBy)
-                .FirstOrDefaultAsync(m => m.NewsArticleId == id);
+            var newsArticle = await _newsArticleService.GetNewsArticleById(id);
             if (newsArticle == null)
             {
                 return NotFound();
@@ -146,19 +122,8 @@ namespace NewsManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var newsArticle = await _context.NewsArticles.FindAsync(id);
-            if (newsArticle != null)
-            {
-                _context.NewsArticles.Remove(newsArticle);
-            }
-
-            await _context.SaveChangesAsync();
+            await _newsArticleService.DeleteNewsArticle(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool NewsArticleExists(string id)
-        {
-            return _context.NewsArticles.Any(e => e.NewsArticleId == id);
         }
     }
 }

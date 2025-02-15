@@ -31,11 +31,12 @@ namespace BusinessLogic.Services
         public async Task<GetNewsArticleDTO> GetNewsArticleById(string id)
         {
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
-            NewsArticle? newsArticle = await repository.GetByIdAsync(id);
+            NewsArticle? newsArticle = await repository.GetByIdAsync(id, na => na.Tags);
             if (newsArticle == null)
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "News article not found!");
             }
+            Console.WriteLine(newsArticle);
             return _mapper.Map<GetNewsArticleDTO>(newsArticle);
         }
 
@@ -61,7 +62,8 @@ namespace BusinessLogic.Services
 
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
             NewsArticle newNewsArticle = _mapper.Map<NewsArticle>(newsArticle);
-
+            // Generate unique id by iterating until a unique id is found(increment)
+            newNewsArticle.NewsArticleId = await GenerateNewIdAsync();
             newNewsArticle.CreatedDate = DateTime.Now;
             newNewsArticle.ModifiedDate = DateTime.Now;
             newNewsArticle.NewsStatus = true;
@@ -118,7 +120,21 @@ namespace BusinessLogic.Services
             if (newsArticle != null)
             {
                 newsArticle.NewsStatus = false;
-                /*repository.Delete(newsArticle);*/
+                repository.Delete(newsArticle);
+                await _unitOfWork.SaveAsync();
+            }
+            else
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "News article not found!");
+            }
+        }
+        public async Task InactiveNewsArticle(string id)
+        {
+            IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
+            NewsArticle? newsArticle = await repository.GetByIdAsync(id);
+            if (newsArticle != null)
+            {
+                newsArticle.NewsStatus = false;
                 await _unitOfWork.SaveAsync();
             }
             else
@@ -143,6 +159,19 @@ namespace BusinessLogic.Services
                 .Where(na => na.CreatedById == createById)
                 .ToList();
             return _mapper.Map<List<GetNewsArticleDTO>>(newsArticles);
+        }
+        private async Task<string> GenerateNewIdAsync()
+        {
+            IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
+
+            // Get all articles and find the highest ID
+            IEnumerable<NewsArticle> allArticles = await repository.GetAllAsync();
+            NewsArticle? lastArticle = allArticles.OrderByDescending(n => int.Parse(n.NewsArticleId)).FirstOrDefault();
+
+            // If no articles exist, start from 1
+            int newId = (lastArticle == null) ? 1 : int.Parse(lastArticle.NewsArticleId) + 1;
+
+            return newId.ToString();
         }
     }
 }

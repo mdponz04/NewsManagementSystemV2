@@ -25,9 +25,12 @@ namespace Repositories.Interface
         Task UpdateAsync(T obj);
         Task DeleteAsync(object entity);
         Task SaveAsync();
-
+        
+        
         //another
         T? Find(Expression<Func<T, bool>> predicate);
         Task<PaginatedList<T>> GetPagging(IQueryable<T> query, int index, int pageSize);
+        Task<T?> GetByIdAsync(object id, params Expression<Func<T, object>>[] includes);
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, params Expression<Func<T, object>>[] includes);
     }
 }

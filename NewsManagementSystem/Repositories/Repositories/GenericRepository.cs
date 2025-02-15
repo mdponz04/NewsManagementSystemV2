@@ -102,5 +102,28 @@ namespace Repositories.Repositories
         {
             await _dbSet.AddRangeAsync(obj);
         }
+        
+        public async Task<T?> GetByIdAsync(object NewsArticleId, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "NewsArticleId").Equals(NewsArticleId));
+        }
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.ToListAsync();
+        }
     }
 }
