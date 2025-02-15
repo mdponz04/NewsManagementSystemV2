@@ -31,7 +31,8 @@ namespace BusinessLogic.Services
         public async Task<GetNewsArticleDTO> GetNewsArticleById(string id)
         {
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
-            NewsArticle? newsArticle = await repository.GetByIdAsync(id, na => na.Tags);
+            string idFieldName = "NewsArticleId";
+            NewsArticle? newsArticle = await repository.GetEntityByIdEnableIncludeAsync(idFieldName, id, na => na.Tags);
             if (newsArticle == null)
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "News article not found!");

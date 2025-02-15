@@ -2,7 +2,6 @@
 {
     public class GetTagDTO : BaseTagDTO
     {
-        public int TagID { get; set; }
-        public string TagName { get; set; }
+        public int TagId { get; set; }
     }
 }

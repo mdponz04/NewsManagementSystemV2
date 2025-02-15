@@ -6,34 +6,32 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Data.Entities;
+using BusinessLogic.Interfaces;
+using Repositories.DTOs.TagDTOs;
 
 namespace NewsManagementSystem.Controllers
 {
     public class TagsController : Controller
     {
         private readonly NewsManagementDbContext _context;
+        private readonly ITagService _tagService;
 
-        public TagsController(NewsManagementDbContext context)
+        public TagsController(NewsManagementDbContext context, ITagService tagService)
         {
             _context = context;
+            _tagService = tagService;
         }
 
         // GET: Tags
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Tags.ToListAsync());
+            return View(await _tagService.GetAllTag());
         }
 
         // GET: Tags/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tag = await _context.Tags
-                .FirstOrDefaultAsync(m => m.TagId == id);
+            var tag = await _tagService.GetTagById(id);
             if (tag == null)
             {
                 return NotFound();
@@ -53,26 +51,17 @@ namespace NewsManagementSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TagId,TagName,Note")] Tag tag)
+        public async Task<IActionResult> Create(PostTagDTO tag)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(tag);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(tag);
+            
+            int id = await _tagService.CreateTag(tag);
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: Tags/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tag = await _context.Tags.FindAsync(id);
+            var tag = await _tagService.GetTagById(id);
             if (tag == null)
             {
                 return NotFound();
@@ -85,46 +74,21 @@ namespace NewsManagementSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TagId,TagName,Note")] Tag tag)
+        public async Task<IActionResult> Edit(int id, PutTagDTO tag)
         {
             if (id != tag.TagId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(tag);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TagExists(tag.TagId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(tag);
+            await _tagService.UpdateTag(tag);
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: Tags/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tag = await _context.Tags
-                .FirstOrDefaultAsync(m => m.TagId == id);
+            var tag = await _tagService.GetTagById(id);
             if (tag == null)
             {
                 return NotFound();
@@ -138,13 +102,7 @@ namespace NewsManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tag = await _context.Tags.FindAsync(id);
-            if (tag != null)
-            {
-                _context.Tags.Remove(tag);
-            }
-
-            await _context.SaveChangesAsync();
+            await _tagService.DeleteTag(id);
             return RedirectToAction(nameof(Index));
         }
 

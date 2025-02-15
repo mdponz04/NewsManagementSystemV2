@@ -21,29 +21,31 @@ namespace BusinessLogic.Services
 
         public async Task<List<GetTagDTO>> GetAllTag()
         {
-            var repository = _unitOfWork.GetRepository<Tag>();
-            var tags = (await repository.GetAllAsync());
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            IEnumerable<Tag> tags = await repository.GetAllAsync();
             return _mapper.Map<List<GetTagDTO>>(tags);
         }
 
-        public async Task<GetTagDTO> GetTagById(short id)
+        public async Task<GetTagDTO> GetTagById(int id)
         {
-            var repository = _unitOfWork.GetRepository<Tag>();
-            var tag = await repository.GetByIdAsync(id);
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            Tag? tag = await repository.GetByIdAsync(id);
             return _mapper.Map<GetTagDTO>(tag);
         }
 
-        public async Task CreateTag(PostTagDTO tag)
+        public async Task<int> CreateTag(PostTagDTO tag)
         {
-            var repository = _unitOfWork.GetRepository<Tag>();
-            await repository.InsertAsync(_mapper.Map<Tag>(tag));
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            Tag newTag = _mapper.Map<Tag>(tag);
+            await repository.InsertAsync(newTag);
             await _unitOfWork.SaveAsync();
+            return newTag.TagId;
         }
 
         public async Task UpdateTag(PutTagDTO updatedTag)
         {
-            var repository = _unitOfWork.GetRepository<Tag>();
-            var existingTag = await repository.GetByIdAsync(updatedTag.TagId);
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            Tag? existingTag = await repository.GetByIdAsync(updatedTag.TagId);
             if (existingTag == null)
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "Tag not found!");
@@ -58,10 +60,10 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task DeleteTag(short id)
+        public async Task DeleteTag(int id)
         {
-            var repository = _unitOfWork.GetRepository<Tag>();
-            var tag = await repository.GetByIdAsync(id);
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            Tag? tag = await repository.GetByIdAsync(id);
             if (tag != null)
             {
                 repository.Delete(tag);
