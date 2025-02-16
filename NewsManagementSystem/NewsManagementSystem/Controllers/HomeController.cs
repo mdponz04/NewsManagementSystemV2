@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
+using BusinessLogic.Interfaces;
+using BusinessLogic.Services;
 using Data.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,12 @@ namespace NewsManagementSystem.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IJwtTokenService jwtTokenService)
         {
             _logger = logger;
+            _jwtTokenService = jwtTokenService;
         }
 
         public IActionResult Index()
@@ -37,21 +41,17 @@ namespace NewsManagementSystem.Controllers
         {
             var jwtTokenFromSession = HttpContext.Session.GetString("jwt_token");
 
-            // Decode the JWT token to extract the user's name
-            string userName = string.Empty;
-            if (!string.IsNullOrEmpty(jwtTokenFromSession))
-            {
-                var handler = new JwtSecurityTokenHandler();
-                var jsonToken = handler.ReadToken(jwtTokenFromSession) as JwtSecurityToken;
-                if (jsonToken != null)
-                {
-                    // Assuming the user's name is stored in the "name" claim
-                    userName = jsonToken.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
-                }
-            }
+            // Retrieve claims using the JWT token service
+            string userName = _jwtTokenService.GetName(jwtTokenFromSession!);
+            string userEmail = _jwtTokenService.GetEmail(jwtTokenFromSession!);
+            string userRole = _jwtTokenService.GetRole(jwtTokenFromSession!);
+            string userId = _jwtTokenService.GetId(jwtTokenFromSession!);
 
-            // Pass the user name to the view
+            // Pass the user data to the view
             ViewData["UserName"] = userName;
+            ViewData["UserEmail"] = userEmail;
+            ViewData["UserRole"] = userRole;
+            ViewData["UserId"] = userId;
 
             return View("SecurePage");
         }
