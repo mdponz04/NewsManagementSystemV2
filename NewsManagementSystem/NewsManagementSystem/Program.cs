@@ -45,6 +45,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseMiddleware<CustomExceptionHandlerMiddleware>();
 app.UseMiddleware<JwtTokenMiddleware>();  // JWT middleware
+app.MapGet("/", () => Results.Redirect("/Auth/Login"));
 
 app.UseRouting();
 
@@ -74,6 +75,6 @@ app.UseAuthorization();  // Enables authorization
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Auth}/{action=Login}");
 
 app.Run();
