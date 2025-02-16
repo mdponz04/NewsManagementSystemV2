@@ -1,67 +1,46 @@
-﻿@model Repositories.PaggingItem.PaginatedList<Repositories.DTOs.SystemAccountDTOs.GetSystemAccountDTO>
-
+﻿@model Repositories.PaggingItem.PaginatedList<Repositories.DTOs.NewsArticleDTOs.GetNewsArticleDTO>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
 <form asp-action="Search" method="get" class="mb-5">
     <label for="nameSearch">Search:</label>
-    <input type="text" id="searchNameString" name="searchNameString" placeholder="Enter name...">
-    <input type="text" id="searchEmailString" name="searchEmailString" placeholder="Enter email...">
-    <label for="searchRoleString">Role:</label>
-    <select id="searchRoleString" name="searchRoleString">
-        <option value="">-- Select Role --</option>
-        <option value="">All</option>
-        <option value="Staff">Staff</option>
-        <option value="Lecturer">Lecturer</option>
-    </select>
-
-
+    <input type="text" id="searchString" name="searchString" placeholder="Enter search...">
     <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
-
     <button type="submit">Search</button>
 </form>
 
-
-<button type="button" class="btn btn-primary" onclick="loadCreateForm()">Create Account</button>
-
+<h1>Index</h1>
 <table class="table">
     <thead>
         <tr>
             <th>
-                FullName
+                News Title
             </th>
             <th>
-                Email
-            </th>
-            <th>
-                Role
+                Headline
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Items) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoleName)
-            </td>
-            <td>
-                <button class="btn btn-warning" onclick="loadEditForm(@item.AccountId)">Edit</button> |
-                <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.AccountId">Profile</a> |
-                <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.AccountId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Headline)
+                </td>
+                <td>
+                    <button class="btn btn-warning" onclick="loadEditForm(@item.NewsArticleId)">Edit</button> |
+                    <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.NewsArticleId">Profile</a> |
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.NewsArticleId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 <div>
@@ -115,14 +94,14 @@
 
 <script>
     function loadCreateForm() {
-        $.get('/SystemAccounts/Create', function (data) {
+        $.get('/NewsArticles/Create', function (data) {
             $('#createFormContainer').html(data);
             $('#createModal').modal('show');
         });
     }
 
     function loadEditForm(id) {
-        $.get('/SystemAccounts/Edit/' + id, function (data) {
+        $.get('/NewsArticles/Edit/' + id, function (data) {
             $('#editFormContainer').html(data);
             $('#editModal').modal('show');
         });
@@ -130,7 +109,7 @@
 
     $(document).on("submit", "#createAccountForm", function (event) {
         event.preventDefault();
-        $.post('/SystemAccounts/Create', $(this).serialize(), function () {
+        $.post('/NewsArticles/Create', $(this).serialize(), function () {
             $('#createModal').modal('hide');
             location.reload();
         });
@@ -138,9 +117,10 @@
 
     $(document).on("submit", "#editAccountForm", function (event) {
         event.preventDefault();
-        $.post('/SystemAccounts/Edit', $(this).serialize(), function () {
+        $.post('/NewsArticles/Edit', $(this).serialize(), function () {
             $('#editModal').modal('hide');
             location.reload();
         });
     });
 </script>
+

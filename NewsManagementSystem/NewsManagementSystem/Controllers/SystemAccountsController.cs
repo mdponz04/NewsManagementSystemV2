@@ -117,16 +117,11 @@ namespace NewsManagementSystem.Controllers
 
 
         // GET: Search SystemAccounts
-        public async Task<IActionResult> Search(int pageNumber = 1, int pageSize = 3, string? searchString = null)
+        public async Task<IActionResult> Search(int pageNumber = 1, int pageSize = 3, string? searchNameString = null, string? searchEmailString = null, string? searchRoleString = null)
         {
 
             // Fetch paginated user accounts
-            PaginatedList<GetSystemAccountDTO> userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchString, null, null);
-
-            if (userAccountsSearch == null)
-            {
-                userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, null, searchString, null);
-            }
+            PaginatedList<GetSystemAccountDTO> userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchNameString, searchEmailString, null);
 
             // Pass data to the view
             return View("Index", userAccountsSearch);
