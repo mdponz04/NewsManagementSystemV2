@@ -29,9 +29,9 @@ namespace BusinessLogic.Services
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
-        /*
+
         // Get list of newsarticle
-        public async Task<PaginatedList<GetNewsArticleDTO>> NewsArticles(int index, int pageSize, int? idSearch, string? titleSearch, string? headlineSearch)
+        public async Task<PaginatedList<GetNewsArticleDTO>> GetNewsArticles(int index, int pageSize, string? idSearch, string? titleSearch, string? headlineSearch)
         {
             if (index <= 0 || pageSize <= 0)
             {
@@ -41,52 +41,40 @@ namespace BusinessLogic.Services
             IQueryable<NewsArticle> query = _unitOfWork.GetRepository<NewsArticle>().Entities;
 
             // Search by id
-            if (idSearch.HasValue)
+            if (!string.IsNullOrWhiteSpace(idSearch))
             {
-                query = query.Where(u => u.NewsArticleId == idSearch);
+                query = query.Where(u => u.NewsArticleId!.Contains(idSearch));
             }
 
-            // Search by user name
-            if (!string.IsNullOrWhiteSpace(nameSearch))
+            // Search by title
+            if (!string.IsNullOrWhiteSpace(titleSearch))
             {
-                query = query.Where(u => u.AccountName!.Contains(nameSearch));
+                query = query.Where(u => u.NewsTitle!.Contains(titleSearch));
             }
 
-            // Search by email
-            if (!string.IsNullOrWhiteSpace(emailSearch))
+            // Search by headline
+            if (!string.IsNullOrWhiteSpace(headlineSearch))
             {
-                query = query.Where(u => u.AccountEmail!.Equals(emailSearch));
+                query = query.Where(u => u.Headline!.Equals(headlineSearch));
             }
 
-            // Search by role
-            switch (role)
-            {
-                case (EnumRole?)STAFF:
-                    query = query.Where(u => u.AccountRole == STAFF);
-                    break;
-                case (EnumRole?)LECTURER:
-                    query = query.Where(u => u.AccountRole == LECTURER);
-                    break;
-                default:
-                    break;
-            }
 
             // Sort by Id
-            query = query.OrderBy(u => u.AccountId);
+            query = query.OrderBy(u => u.NewsArticleId);
 
-            PaginatedList<SystemAccount> resultQuery = await _unitOfWork.GetRepository<SystemAccount>().GetPagging(query, index, pageSize);
+            PaginatedList<NewsArticle> resultQuery = await _unitOfWork.GetRepository<NewsArticle>().GetPagging(query, index, pageSize);
 
             // Map user entities to user dto
-            IReadOnlyCollection<GetSystemAccountDTO> responseItems = resultQuery.Items.Select(item =>
+            IReadOnlyCollection<GetNewsArticleDTO> responseItems = resultQuery.Items.Select(item =>
             {
-                GetSystemAccountDTO responseItem = _mapper.Map<GetSystemAccountDTO>(item);
+                GetNewsArticleDTO responseItem = _mapper.Map<GetNewsArticleDTO>(item);
 
-                responseItem.RoleName = item.AccountRole == STAFF ? "Staff" : "Lecturer";
+            //    responseItem.RoleName = item.AccountRole == STAFF ? "Staff" : "Lecturer";
 
                 return responseItem;
             }).ToList();
 
-            PaginatedList<GetSystemAccountDTO> paginatedList = new(
+            PaginatedList<GetNewsArticleDTO> paginatedList = new(
                 responseItems,
                 resultQuery.TotalCount,
                 resultQuery.PageNumber,
@@ -95,6 +83,6 @@ namespace BusinessLogic.Services
 
             return paginatedList;
         }
-        */
+        
     }
 }

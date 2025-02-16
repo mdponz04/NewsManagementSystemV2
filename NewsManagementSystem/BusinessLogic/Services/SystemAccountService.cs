@@ -60,7 +60,9 @@ namespace BusinessLogic.Services
             // Search by email
             if (!string.IsNullOrWhiteSpace(emailSearch))
             {
-                query = query.Where(u => u.AccountEmail!.Equals(emailSearch));
+                // query = query.Where(u => u.AccountEmail!.Equals(emailSearch));
+                emailSearch = emailSearch.Trim();
+                query = query.Where(u => u.AccountEmail!.Trim().ToLower().Contains(emailSearch.ToLower()));
             }
 
             // Search by role
