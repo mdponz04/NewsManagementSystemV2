@@ -1,5 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Secure Page";
+    var userName = ViewData["UserName"] as string;
+
 }
 
 <!DOCTYPE html>
@@ -24,6 +26,11 @@
         <main role="main" class="pb-3">
             <h1>Welcome to the Secure Page</h1>
             <p>This page is only accessible to authorized users.</p>
+
+            @if (!string.IsNullOrEmpty(userName))
+            {
+                <p>Hello, @userName!</p>
+            }
 
             <!-- Button for some action -->
             <button class="btn btn-primary" onclick="window.location.href='/SomeOtherAction'">Go to Another Page</button>
