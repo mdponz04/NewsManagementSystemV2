@@ -119,9 +119,14 @@ namespace NewsManagementSystem.Controllers
         // GET: Search SystemAccounts
         public async Task<IActionResult> Search(int pageNumber = 1, int pageSize = 3, string? searchNameString = null, string? searchEmailString = null, string? searchRoleString = null)
         {
+            EnumRole? roleFilter = null;
+            if (!string.IsNullOrEmpty(searchRoleString) && Enum.TryParse(searchRoleString, out EnumRole parsedRole))
+            {
+                roleFilter = parsedRole;
+            }
 
             // Fetch paginated user accounts
-            PaginatedList<GetSystemAccountDTO> userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchNameString, searchEmailString, null);
+            PaginatedList<GetSystemAccountDTO> userAccountsSearch = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchNameString, searchEmailString, roleFilter);
 
             // Pass data to the view
             return View("Index", userAccountsSearch);
