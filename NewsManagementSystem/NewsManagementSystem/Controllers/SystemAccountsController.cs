@@ -27,7 +27,7 @@ namespace NewsManagementSystem.Controllers
                 return View(userAccounts);
         }
 
-        // GET: SystemAccounts/Details/5
+        // GET: SystemAccounts/Profile/{id}
         public async Task<IActionResult> Profile(short id)
         {
             GetSystemAccountDTO userAccount = await _systemAccountService.GetUserAccountById(id);

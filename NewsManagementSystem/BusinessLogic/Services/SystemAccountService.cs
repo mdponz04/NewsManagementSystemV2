@@ -26,6 +26,8 @@ namespace BusinessLogic.Services
 
         private const int STAFF = 1;
         private const int LECTURER = 2;
+        private const int ADMIN = 0;
+        private const int ADMIN_ID = 0;
         private const int STARTING_NUMBER = 0;
 
         public SystemAccountService(IMapper mapper, IUOW unitOfWork, IConfiguration configuration)
@@ -222,6 +224,29 @@ namespace BusinessLogic.Services
 
         public async Task<string> Login(LoginDTO loginDTO)
         {
+            string? token = null;
+
+            // Get admin info from appsettings
+            IConfigurationSection adminConfig = _configuration.GetSection("AdminAccount");
+            string? adminEmail = adminConfig.GetValue<string>("Email");
+            string? adminPassword = adminConfig.GetValue<string>("Password");
+
+            // login as admin
+            if (loginDTO.AccountEmail == adminEmail && loginDTO.AccountPassword == adminPassword)
+            {
+                // Create a dummy user object for the admin
+                SystemAccount adminUser = new()
+                {
+                    AccountEmail = adminEmail,
+                    AccountId = ADMIN_ID,
+                    AccountRole = ADMIN,
+                    AccountName = "Admin"
+                };
+
+                token = GenerateJwtToken(adminUser);
+                return token;
+            }
+
             var user = await _unitOfWork.GetRepository<SystemAccount>()
                 .Entities
                 .FirstOrDefaultAsync(u => u.AccountEmail == loginDTO.AccountEmail);
@@ -231,7 +256,7 @@ namespace BusinessLogic.Services
                 throw new ErrorException(StatusCodes.Status401Unauthorized, "401", "Invalid credentials");
             }
 
-            var token = GenerateJwtToken(user);
+            token = GenerateJwtToken(user);
             return token;
         }
 
