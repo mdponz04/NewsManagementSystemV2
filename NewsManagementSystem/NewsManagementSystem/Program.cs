@@ -6,6 +6,10 @@ using BusinessLogic;
 using NewsManagementSystem.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Adjust timeout as needed
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -26,6 +30,8 @@ builder.Services.AddDbContext<NewsManagementDbContext>(options =>
 
 builder.Services.AddApplication(builder.Configuration);
 var app = builder.Build();
+app.Logger.LogInformation("Logging is configured correctly.");
+app.UseSession();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
