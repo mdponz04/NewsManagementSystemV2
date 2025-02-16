@@ -13,7 +13,6 @@ namespace NewsManagementSystem.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IJwtTokenService _jwtTokenService;
-
         public HomeController(ILogger<HomeController> logger, IJwtTokenService jwtTokenService)
         {
             _logger = logger;
