@@ -44,6 +44,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseMiddleware<CustomExceptionHandlerMiddleware>();
+app.UseMiddleware<JwtTokenMiddleware>();  // JWT middleware
 
 app.UseRouting();
 

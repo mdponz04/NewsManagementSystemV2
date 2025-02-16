@@ -37,15 +37,14 @@
                         </li>
 
                         <!-- Show Login or Logout based on authentication -->
-                        @if (ViewData["JwtToken"] != null)
+                        @if (Context.Session.GetString("jwt_token") != null)
                         {
-                            <li class="nav-item">
-                                <form action="/Auth/Logout" method="post" class="nav-item-logout">
-                                    <button type="submit" class="nav-link text-dark btn btn-link" style="border: none; background: none;">
-                                        Logout
-                                    </button>
-                                </form>
-                            </li>
+                            <form action="/Auth/Logout" method="post" class="nav-item-logout">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="nav-link text-dark btn btn-link" style="border: none; background: none;">
+                                    Logout
+                                </button>
+                            </form>
                         }
                         else
                         {
