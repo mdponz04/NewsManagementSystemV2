@@ -6,9 +6,15 @@ using Data.Enum;
 using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Repositories.DTOs.SystemAccountDTOs;
 using Repositories.Interface;
 using Repositories.PaggingItem;
+
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Security.Claims;
 
 namespace BusinessLogic.Services
 {
@@ -16,15 +22,19 @@ namespace BusinessLogic.Services
     {
         private readonly IMapper _mapper;
         private readonly IUOW _unitOfWork;
+        private readonly IConfiguration _configuration;
 
         private const int STAFF = 1;
         private const int LECTURER = 2;
+        private const int ADMIN = 0;
+        private const int ADMIN_ID = 0;
         private const int STARTING_NUMBER = 0;
 
-        public SystemAccountService(IMapper mapper, IUOW unitOfWork)
+        public SystemAccountService(IMapper mapper, IUOW unitOfWork, IConfiguration configuration)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
         }
 
         // Get list of system user
@@ -53,7 +63,9 @@ namespace BusinessLogic.Services
             // Search by email
             if (!string.IsNullOrWhiteSpace(emailSearch))
             {
-                query = query.Where(u => u.AccountEmail!.Equals(emailSearch));
+                // query = query.Where(u => u.AccountEmail!.Equals(emailSearch));
+                emailSearch = emailSearch.Trim();
+                query = query.Where(u => u.AccountEmail!.Trim().ToLower().Contains(emailSearch.ToLower()));
             }
 
             // Search by role
@@ -212,5 +224,68 @@ namespace BusinessLogic.Services
             await _unitOfWork.GetRepository<SystemAccount>().InsertAsync(newUser);
             await _unitOfWork.SaveAsync();
         }
+
+        public async Task<string> Login(LoginDTO loginDTO)
+        {
+            string? token = null;
+
+            // Get admin info from appsettings
+            IConfigurationSection adminConfig = _configuration.GetSection("AdminAccount");
+            string? adminEmail = adminConfig.GetValue<string>("Email");
+            string? adminPassword = adminConfig.GetValue<string>("Password");
+
+            // login as admin
+            if (loginDTO.AccountEmail == adminEmail && loginDTO.AccountPassword == adminPassword)
+            {
+                // Create a dummy user object for the admin
+                SystemAccount adminUser = new()
+                {
+                    AccountEmail = adminEmail,
+                    AccountId = ADMIN_ID,
+                    AccountRole = ADMIN,
+                    AccountName = "Admin"
+                };
+
+                token = GenerateJwtToken(adminUser);
+                return token;
+            }
+
+            var user = await _unitOfWork.GetRepository<SystemAccount>()
+                .Entities
+                .FirstOrDefaultAsync(u => u.AccountEmail == loginDTO.AccountEmail);
+
+            if (user == null || loginDTO.AccountPassword != user.AccountPassword)
+            {
+                throw new ErrorException(StatusCodes.Status401Unauthorized, "401", "Invalid credentials");
+            }
+
+            token = GenerateJwtToken(user);
+            return token;
+        }
+
+        private string GenerateJwtToken(SystemAccount user)
+        {
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.AccountId.ToString()),
+        new Claim(ClaimTypes.Name, user.AccountName),
+        new Claim(ClaimTypes.Email, user.AccountEmail),
+        new Claim(ClaimTypes.Role, user.AccountRole.ToString())
+    };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+
     }
 }

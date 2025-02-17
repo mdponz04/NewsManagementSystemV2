@@ -1,5 +1,10 @@
-﻿using Data.Entities;
-using Repositories.DTOs.TagDTOs;
+﻿using Repositories.DTOs.TagDTOs;
+using Repositories.PaggingItem;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BusinessLogic.Interfaces
 {
@@ -11,5 +16,6 @@ namespace BusinessLogic.Interfaces
         Task UpdateTag(PutTagDTO updatedTag);
         Task DeleteTag(int id);
         Task<List<Tag>> GetListTagByIdEntityType(List<int> ids);
+        Task<PaginatedList<GetTagDTO>> GetTags(int index, int pageSize, int? idSearch, string? nameSearch, string? noteSearch);
     }
 }

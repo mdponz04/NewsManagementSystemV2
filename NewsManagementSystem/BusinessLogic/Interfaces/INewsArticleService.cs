@@ -1,5 +1,10 @@
-﻿using Data.Entities;
-using Repositories.DTOs.NewsArticleDTOs;
+﻿using Repositories.DTOs.NewsArticleDTOs;
+using Repositories.PaggingItem;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BusinessLogic.Interfaces
 {
@@ -14,8 +19,7 @@ namespace BusinessLogic.Interfaces
         Task<List<GetNewsArticleDTO>> GetActiveNewsArticle();
         Task<List<GetNewsArticleDTO>> GetNewsArticleAccordingToCreateById(short createById);
         Task<IEnumerable<Category>> GetCategoriesAsync();
-        //Show tag that not include in news article
-
-
+        
+        Task<PaginatedList<GetNewsArticleDTO>> GetNewsArticles(int index, int pageSize, string? idSearch, string? titleSearch, string? headlineSearch);
     }
 }

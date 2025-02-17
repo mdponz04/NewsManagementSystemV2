@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repositories.Interface;
 using Repositories.Repositories;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace BusinessLogic;
 
@@ -34,8 +37,28 @@ public static class DependencyInjection
     public static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ISystemAccountService, SystemAccountService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+        // JWT Authentication configuration
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
+                };
+            });
+
+        services.AddAuthorization();
+
         services.AddScoped<ITagService, TagService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<INewsArticleService, NewsArticleService>();
     }
-
 }

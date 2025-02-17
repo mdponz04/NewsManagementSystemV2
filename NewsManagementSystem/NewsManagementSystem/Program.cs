@@ -6,9 +6,20 @@ using BusinessLogic;
 using NewsManagementSystem.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Adjust timeout as needed
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add logging
+builder.Services.AddLogging(config =>
+{
+    config.AddConsole(); 
+    config.AddDebug();   
+});
 
 // Get connection string from appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("MyCnn");
@@ -19,6 +30,8 @@ builder.Services.AddDbContext<NewsManagementDbContext>(options =>
 
 builder.Services.AddApplication(builder.Configuration);
 var app = builder.Build();
+app.Logger.LogInformation("Logging is configured correctly.");
+app.UseSession();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -31,13 +44,37 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseMiddleware<CustomExceptionHandlerMiddleware>();
+app.UseMiddleware<JwtTokenMiddleware>();  // JWT middleware
+app.MapGet("/", () => Results.Redirect("/Auth/Login"));
 
 app.UseRouting();
 
-app.UseAuthorization();
+// Add logging middleware
+app.Use(async (context, next) =>
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+    // Log incoming request details (method, path, headers, etc.)
+    logger.LogInformation($"Request Method: {context.Request.Method}");
+    logger.LogInformation($"Request Path: {context.Request.Path}");
+    logger.LogInformation($"Request Headers: {string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}: {h.Value}"))}");
+
+    // Log JWT token if present in the header
+    var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+    if (!string.IsNullOrWhiteSpace(token))
+    {
+        logger.LogInformation($"JWT Token: {token}");
+    }
+    
+    await next.Invoke();
+});
+
+
+app.UseAuthentication(); // Enables authentication
+app.UseAuthorization();  // Enables authorization
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Auth}/{action=Login}");
 
 app.Run();

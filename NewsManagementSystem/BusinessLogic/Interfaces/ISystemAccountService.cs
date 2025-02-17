@@ -15,5 +15,6 @@ namespace BusinessLogic.Interfaces
         Task UpdateUserAccountById(PutSystemAccountDTO updatedUserAccount);
 
         Task DeleteUserAccountById(short id);
+        Task<string> Login(LoginDTO loginDTO);
     }
 }

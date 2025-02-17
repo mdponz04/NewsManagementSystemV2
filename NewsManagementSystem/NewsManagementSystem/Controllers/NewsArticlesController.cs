@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Data.Entities;
 using BusinessLogic.Interfaces;
 using Repositories.DTOs.NewsArticleDTOs;
+﻿using BusinessLogic.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Repositories.DTOs.NewsArticleDTOs;
+using Repositories.PaggingItem;
 
 namespace NewsManagementSystem.Controllers
 {
