@@ -8,9 +8,9 @@ namespace Repositories.DTOs.NewsArticleDTOs
 {
     public class GetNewsArticleDTO : BaseNewsArticleDTO
     {
-        public int NewsArticleId { get; set; }
-        public int CategoryId { get; set; }
-        public int CreatedById { get; set; }
-        public int UpdatedById { get; set; }
+        public short NewsArticleId { get; set; }
+        public string Category { get; set; } = string.Empty;
+        public string CreatedBy { get; set; } = string.Empty;
+        public string UpdatedBy { get; set; } = string.Empty;
     }
 }

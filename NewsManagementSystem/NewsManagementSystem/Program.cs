@@ -6,6 +6,10 @@ using BusinessLogic;
 using NewsManagementSystem.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Adjust timeout as needed
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -26,6 +30,8 @@ builder.Services.AddDbContext<NewsManagementDbContext>(options =>
 
 builder.Services.AddApplication(builder.Configuration);
 var app = builder.Build();
+app.Logger.LogInformation("Logging is configured correctly.");
+app.UseSession();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -38,6 +44,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseMiddleware<CustomExceptionHandlerMiddleware>();
+app.UseMiddleware<JwtTokenMiddleware>();  // JWT middleware
+app.MapGet("/", () => Results.Redirect("/Auth/Login"));
 
 app.UseRouting();
 
@@ -67,6 +75,6 @@ app.UseAuthorization();  // Enables authorization
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Auth}/{action=Login}");
 
 app.Run();
