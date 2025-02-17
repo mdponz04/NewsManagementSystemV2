@@ -74,6 +74,24 @@ namespace BusinessLogic.Services
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "Tag not found!");
             }
         }
-        
+        public async Task<List<Tag>> GetListTagByIdEntityType(List<int> ids)
+        {
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            List<Tag> tags = new List<Tag>();
+            foreach(int id in ids)
+            {
+                Tag? tag = await repository.GetByIdAsync(id);
+
+                if (tag == null)
+                {
+                    throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "Tag not found!");
+                }
+                else
+                {
+                    tags.Add(tag);
+                }
+            }
+            return tags;
+        }
     }
 }

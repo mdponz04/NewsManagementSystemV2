@@ -1,6 +1,8 @@
 ﻿@model Repositories.DTOs.NewsArticleDTOs.PostNewsArticleDTO
+@using Repositories.DTOs.TagDTOs
 @{
     ViewData["Title"] = "Create";
+	var tags = ViewData["Tags"] as List<GetTagDTO>;
 }
 
 <h1>Create</h1>
@@ -37,6 +39,18 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+            <div>
+                <ul>
+                    @foreach (var tag in tags)
+                    {
+                        <li>
+                            <label>
+                                <input type="checkbox" name="SelectedTags" value="@tag.TagId"> @tag.TagName
+                            </label>
+                        </li>
+                    }
+                </ul>
             </div>
         </form>
     </div>

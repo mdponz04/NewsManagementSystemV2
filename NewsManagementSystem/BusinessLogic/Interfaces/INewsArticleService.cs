@@ -1,4 +1,5 @@
-﻿using Repositories.DTOs.NewsArticleDTOs;
+﻿using Data.Entities;
+using Repositories.DTOs.NewsArticleDTOs;
 
 namespace BusinessLogic.Interfaces
 {
@@ -12,5 +13,9 @@ namespace BusinessLogic.Interfaces
         Task InactiveNewsArticle(string id);
         Task<List<GetNewsArticleDTO>> GetActiveNewsArticle();
         Task<List<GetNewsArticleDTO>> GetNewsArticleAccordingToCreateById(short createById);
+        Task<IEnumerable<Category>> GetCategoriesAsync();
+        //Show tag that not include in news article
+
+
     }
 }

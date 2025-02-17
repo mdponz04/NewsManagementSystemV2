@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using Data.Entities;
 using BusinessLogic.Interfaces;
 using Repositories.DTOs.TagDTOs;
@@ -25,13 +19,14 @@ namespace NewsManagementSystem.Controllers
         // GET: Tags
         public async Task<IActionResult> Index()
         {
+            var tags = await _tagService.GetAllTag();
             return View(await _tagService.GetAllTag());
         }
 
         // GET: Tags/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var tag = await _tagService.GetTagById(id);
+            GetTagDTO tag = await _tagService.GetTagById(id);
             if (tag == null)
             {
                 return NotFound();
@@ -61,7 +56,7 @@ namespace NewsManagementSystem.Controllers
         // GET: Tags/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var tag = await _tagService.GetTagById(id);
+            GetTagDTO tag = await _tagService.GetTagById(id);
             if (tag == null)
             {
                 return NotFound();
@@ -88,7 +83,7 @@ namespace NewsManagementSystem.Controllers
         // GET: Tags/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var tag = await _tagService.GetTagById(id);
+            GetTagDTO tag = await _tagService.GetTagById(id);
             if (tag == null)
             {
                 return NotFound();

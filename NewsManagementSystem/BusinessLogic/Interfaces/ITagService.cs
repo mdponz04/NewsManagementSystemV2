@@ -1,4 +1,5 @@
-﻿using Repositories.DTOs.TagDTOs;
+﻿using Data.Entities;
+using Repositories.DTOs.TagDTOs;
 
 namespace BusinessLogic.Interfaces
 {
@@ -9,5 +10,6 @@ namespace BusinessLogic.Interfaces
         Task<int> CreateTag(PostTagDTO tag);
         Task UpdateTag(PutTagDTO updatedTag);
         Task DeleteTag(int id);
+        Task<List<Tag>> GetListTagByIdEntityType(List<int> ids);
     }
 }

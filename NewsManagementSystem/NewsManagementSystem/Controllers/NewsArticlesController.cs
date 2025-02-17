@@ -14,12 +14,15 @@ namespace NewsManagementSystem.Controllers
     public class NewsArticlesController : Controller
     {
         private readonly NewsManagementDbContext _context;
+        
         private readonly INewsArticleService _newsArticleService;
+        private readonly ITagService _tagService;
 
-        public NewsArticlesController(INewsArticleService newsArticleService, NewsManagementDbContext context)
+        public NewsArticlesController(ITagService tagService, INewsArticleService newsArticleService, NewsManagementDbContext context)
         {
             _context = context;
             _newsArticleService = newsArticleService;
+            _tagService = tagService;
         }
 
         // GET: NewsArticles
@@ -48,10 +51,16 @@ namespace NewsManagementSystem.Controllers
         }
 
         // GET: NewsArticles/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            // Populating ViewData for Category and Tags
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
-            return View();
+            var tags = await _tagService.GetAllTag();
+            ViewData["Tags"] = tags;
+
+            // Initialize an empty model to pass to the view
+            var model = new PostNewsArticleDTO();
+            return View(model);
         }
 
         // POST: NewsArticles/Create
@@ -61,7 +70,17 @@ namespace NewsManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PostNewsArticleDTO newsArticle)
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryDesciption", newsArticle.CategoryId);
+            if(!ModelState.IsValid)
+            {
+                ViewData["CategoryId"] = new SelectList(await _newsArticleService.GetCategoriesAsync(), "CategoryId", "CategoryDescription");
+                ViewData["Tags"] = await _tagService.GetAllTag();
+
+                return View(newsArticle);
+            }
+            //Selected tags from the form
+            
+            newsArticle.Tags = await _tagService.GetListTagByIdEntityType(newsArticle.SelectedTags);
+            
             string id = await _newsArticleService.CreateNewsArticle(newsArticle);
             return RedirectToAction(nameof(Details), new { id });
         }
@@ -79,7 +98,7 @@ namespace NewsManagementSystem.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", newsArticle.CategoryId);
+            ViewData["CategoryId"] = new SelectList(await _newsArticleService.GetCategoriesAsync(), "CategoryId", "CategoryDescription");
             return View(newsArticle);
         }
 

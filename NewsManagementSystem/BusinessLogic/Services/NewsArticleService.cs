@@ -4,6 +4,7 @@ using Data.Constants;
 using Data.Entities;
 using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Repositories.DTOs.NewsArticleDTOs;
 using Repositories.Interface;
 
@@ -30,14 +31,21 @@ namespace BusinessLogic.Services
 
         public async Task<GetNewsArticleDTO> GetNewsArticleById(string id)
         {
-            IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
-            string idFieldName = "NewsArticleId";
-            NewsArticle? newsArticle = await repository.GetEntityByIdEnableIncludeAsync(idFieldName, id, na => na.Tags);
+            IQueryable<NewsArticle> query = _unitOfWork.GetRepository<NewsArticle>().Entities;
+            NewsArticle? newsArticle = await query.FirstOrDefaultAsync(na => na.NewsArticleId == id);
+            
+
+            NewsArticle? article = await query
+                .Where(a => a.NewsArticleId == id)
+                .Include(a => a.Tags) // Eager load tags
+                .FirstOrDefaultAsync();
+
             if (newsArticle == null)
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "News article not found!");
             }
-            Console.WriteLine(newsArticle);
+
+            
             return _mapper.Map<GetNewsArticleDTO>(newsArticle);
         }
 
@@ -60,7 +68,7 @@ namespace BusinessLogic.Services
             {
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "News source is required.");
             }
-
+            
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
             NewsArticle newNewsArticle = _mapper.Map<NewsArticle>(newsArticle);
             // Generate unique id by iterating until a unique id is found(increment)
@@ -173,6 +181,12 @@ namespace BusinessLogic.Services
             int newId = (lastArticle == null) ? 1 : int.Parse(lastArticle.NewsArticleId) + 1;
 
             return newId.ToString();
+        }
+        //Temporary method to get categories
+        public async Task<IEnumerable<Category>> GetCategoriesAsync()
+        {
+            IGenericRepository<Category> repository = _unitOfWork.GetRepository<Category>();
+            return (await repository.GetAllAsync()).ToList();
         }
     }
 }
