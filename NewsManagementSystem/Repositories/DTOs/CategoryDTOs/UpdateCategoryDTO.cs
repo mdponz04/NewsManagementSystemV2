@@ -8,7 +8,7 @@ namespace Repositories.DTOs.CategoryDTOs
 {
     public class UpdateCategoryDTO : BaseCategoryDTO
     {
-        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
-        public string? UpdatedBy { get; set; } = string.Empty;
+        public short CategoryID { get; set; }
+
     }
 }

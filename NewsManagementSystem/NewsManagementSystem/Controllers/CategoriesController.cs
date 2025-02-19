@@ -42,16 +42,26 @@ namespace NewsManagementSystem.Controllers
             return View();
         }
 
-        // POST: Create Category
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateCategoryDTO categoryDto)
+        public async Task<IActionResult> Create([FromBody] CreateCategoryDTO categoryDto)
         {
             if (ModelState.IsValid)
             {
-                // Create category
                 var createdCategory = await _categoryService.CreateCategory(categoryDto);
-                return RedirectToAction(nameof(Index)); // Redirect to index after successful creation
+
+                // If this is an AJAX request, return JSON rather than a redirect.
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = true });
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            // If ModelState is invalid and the request is AJAX, send a JSON error response.
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Json(new { success = false, error = "Validation failed" });
             }
             return View(categoryDto);
         }

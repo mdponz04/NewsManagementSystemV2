@@ -118,14 +118,11 @@ namespace BusinessLogic.Services
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Category data is required!");
             }
 
-            // Map the DTO to the Category entity
             Category category = _mapper.Map<Category>(categoryDto);
 
-            // Save the category to the database
             await _unitOfWork.GetRepository<Category>().InsertAsync(category);
             await _unitOfWork.SaveAsync();
 
-            // Map the saved entity to the response DTO
             return _mapper.Map<CreateCategoryDTO>(category);
         }
         public async Task<UpdateCategoryDTO> UpdateCategory(int categoryId, UpdateCategoryDTO categoryDto)
