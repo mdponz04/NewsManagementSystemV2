@@ -7,11 +7,7 @@ using Repositories.DTOs.CategoryDTOs;
 using Repositories.Interface;
 using Repositories.PaggingItem;
 using BusinessLogic.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Services
 {
@@ -89,6 +85,24 @@ namespace BusinessLogic.Services
                 );
 
             return paginatedList;
+        }
+        public async Task<IEnumerable<GetCategoryDTO>> GetAllCategories()
+        {
+            IQueryable<Category> query = _unitOfWork.GetRepository<Category>().Entities;
+            query = query.OrderBy(c => c.CategoryName);
+            IEnumerable<Category> categories = await query.ToListAsync();
+            return _mapper.Map<IEnumerable<GetCategoryDTO>>(categories);
+        }
+        // Get category by id
+        public async Task<GetCategoryDTO> GetCategoryById(short id)
+        {
+            Category? category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
+            if (category == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Category not found!");
+            }
+            GetCategoryDTO responseItem = _mapper.Map<GetCategoryDTO>(category);
+            return responseItem;
         }
     }
 }

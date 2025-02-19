@@ -30,6 +30,5 @@ public partial class NewsArticle
     public virtual Category? Category { get; set; }
 
     public virtual SystemAccount? CreatedBy { get; set; }
-
-    public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+    public virtual ICollection<NewsTag>? NewsTags { get; set; } = new List<NewsTag>();
 }

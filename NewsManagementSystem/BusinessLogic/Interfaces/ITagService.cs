@@ -1,4 +1,5 @@
-﻿using Repositories.DTOs.TagDTOs;
+﻿using Data.Entities;
+using Repositories.DTOs.TagDTOs;
 using Repositories.PaggingItem;
 using System;
 using System.Collections.Generic;

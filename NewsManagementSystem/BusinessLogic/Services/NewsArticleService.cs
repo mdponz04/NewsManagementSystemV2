@@ -7,18 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Repositories.DTOs.NewsArticleDTOs;
 using Repositories.Interface;
-using Data.Enum;
-using Data.ExceptionCustom;
-using Microsoft.AspNetCore.Http;
-using Repositories.DTOs.NewsArticleDTOs;
-using Repositories.DTOs.SystemAccountDTOs;
-using Repositories.Interface;
 using Repositories.PaggingItem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BusinessLogic.Services
 {
@@ -45,25 +35,51 @@ namespace BusinessLogic.Services
         {
             IQueryable<NewsArticle> query = _unitOfWork.GetRepository<NewsArticle>().Entities;
             NewsArticle? newsArticle = await query.FirstOrDefaultAsync(na => na.NewsArticleId == id);
+            List<NewsTag> newsTagList = await _unitOfWork.GetRepository<NewsTag>().Entities
+                .Where(nt => nt.NewsArticleId == id)
+                .ToListAsync();
             
-
-            NewsArticle? article = await query
-                .Where(a => a.NewsArticleId == id)
-                .Include(a => a.Tags) // Eager load tags
-                .FirstOrDefaultAsync();
-
             if (newsArticle == null)
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "News article not found!");
             }
+            newsArticle.NewsTags = newsTagList;
 
-            
-            return _mapper.Map<GetNewsArticleDTO>(newsArticle);
+            GetNewsArticleDTO showNewsArticle = _mapper.Map<GetNewsArticleDTO>(newsArticle);
+            showNewsArticle.CreatedByName = await GetCreatedNameByArticleId(id);
+            showNewsArticle.UpdatedByName = await GetUpdatedNameByArticleId(id);
+            return showNewsArticle;
         }
 
         public async Task<string> CreateNewsArticle(PostNewsArticleDTO newsArticle)
         {
-            // Validate news article fields
+            ValidateNewsArticle(_mapper.Map<NewsArticle>(newsArticle));
+            //Create new news article
+            IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
+            NewsArticle newNewsArticle = _mapper.Map<NewsArticle>(newsArticle);
+            newNewsArticle.NewsArticleId = await GenerateNewIdAsync();
+            newNewsArticle.CreatedDate = DateTime.Now;
+            newNewsArticle.ModifiedDate = DateTime.Now;
+            
+            newNewsArticle.NewsStatus = true;
+            await repository.InsertAsync(newNewsArticle);
+
+
+            //Create news tag that is show relationship between news article and tag
+            foreach (int selectedTagId in newsArticle.SelectedTags)
+            {
+                NewsTag newsTag = new();
+                newsTag.NewsArticleId = newNewsArticle.NewsArticleId;
+                newsTag.TagId = selectedTagId;
+
+                await _unitOfWork.GetRepository<NewsTag>().InsertAsync(newsTag);
+            }
+            
+            await _unitOfWork.SaveAsync();
+            return newNewsArticle.NewsArticleId;
+        }
+        private void ValidateNewsArticle(NewsArticle newsArticle)
+        {
             if (string.IsNullOrWhiteSpace(newsArticle.NewsTitle))
             {
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "News title is required.");
@@ -80,55 +96,46 @@ namespace BusinessLogic.Services
             {
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "News source is required.");
             }
-            
-            IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
-            NewsArticle newNewsArticle = _mapper.Map<NewsArticle>(newsArticle);
-            // Generate unique id by iterating until a unique id is found(increment)
-            newNewsArticle.NewsArticleId = await GenerateNewIdAsync();
-            newNewsArticle.CreatedDate = DateTime.Now;
-            newNewsArticle.ModifiedDate = DateTime.Now;
-            newNewsArticle.NewsStatus = true;
-
-            await repository.InsertAsync(newNewsArticle);
-            await _unitOfWork.SaveAsync();
-            return newNewsArticle.NewsArticleId;
         }
-
         public async Task UpdateNewsArticle(PutNewsArticleDTO updatedNewsArticle)
         {
-            // Validate news article fields
-            if (string.IsNullOrWhiteSpace(updatedNewsArticle.NewsTitle))
-            {
-                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "News title is required.");
-            }
-            if (string.IsNullOrWhiteSpace(updatedNewsArticle.Headline))
-            {
-                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Headline is required.");
-            }
-            if (string.IsNullOrWhiteSpace(updatedNewsArticle.NewsContent))
-            {
-                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "News content is required.");
-            }
-            if (string.IsNullOrWhiteSpace(updatedNewsArticle.NewsSource))
-            {
-                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "News source is required.");
-            }
+            ValidateNewsArticle(_mapper.Map<NewsArticle>(updatedNewsArticle));
 
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
             NewsArticle? existingNewsArticle = await repository
                 .GetByIdAsync(updatedNewsArticle.NewsArticleId);
+
             if (existingNewsArticle == null)
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "News article not found!");
             }
+
+            IGenericRepository<NewsTag> newsTagRepo = _unitOfWork.GetRepository<NewsTag>();
+            // Remove existing tags
+            List<NewsTag> existingNewsTag = await _unitOfWork
+                .GetRepository<NewsTag>()
+                .Entities
+                .Where(nt => nt.NewsArticleId == existingNewsArticle.NewsArticleId)
+                .ToListAsync();
+
+            foreach (NewsTag newsTag in existingNewsTag)
+            {
+                if (newsTag == null) continue;
+                existingNewsArticle.NewsTags?.Remove(newsTag);
+                newsTagRepo.Delete(newsTag);
+            }
+
             // Update properties
             _mapper.Map(updatedNewsArticle, existingNewsArticle);
-            
-            /*existingNewsArticle.NewsTitle = updatedNewsArticle.NewsTitle;
-            existingNewsArticle.Headline = updatedNewsArticle.Headline;
-            existingNewsArticle.NewsContent = updatedNewsArticle.NewsContent;
-            existingNewsArticle.NewsSource = updatedNewsArticle.NewsSource;
-            existingNewsArticle.ModifiedDate = DateTime.Now;*/
+            //Add new tags to NewsTag table
+            foreach (int selectedTagId in updatedNewsArticle.SelectedTags)
+            {
+                NewsTag newsTag = new();
+                newsTag.NewsArticleId = existingNewsArticle.NewsArticleId;
+                newsTag.TagId = selectedTagId;
+
+                await _unitOfWork.GetRepository<NewsTag>().InsertAsync(newsTag);
+            }
 
             repository.Update(existingNewsArticle);
             await _unitOfWork.SaveAsync();
@@ -138,9 +145,15 @@ namespace BusinessLogic.Services
         {
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
             NewsArticle? newsArticle = await repository.GetByIdAsync(id);
+
             if (newsArticle != null)
             {
-                newsArticle.NewsStatus = false;
+                List<NewsTag> newsTagsToRemove = _unitOfWork.GetRepository<NewsTag>().Entities
+                    .Where(tag => tag.NewsArticleId == id).ToList();
+                foreach(var newsTag in newsTagsToRemove)
+                {
+                    _unitOfWork.GetRepository<NewsTag>().Delete(newsTag);
+                }
                 repository.Delete(newsArticle);
                 await _unitOfWork.SaveAsync();
             }
@@ -175,11 +188,54 @@ namespace BusinessLogic.Services
         
         public async Task<List<GetNewsArticleDTO>> GetNewsArticleAccordingToCreateById(short createById)
         {
+            // Get all news articles created by the user
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
             List<NewsArticle> newsArticles = (await repository.GetAllAsync())
                 .Where(na => na.CreatedById == createById)
                 .ToList();
-            return _mapper.Map<List<GetNewsArticleDTO>>(newsArticles);
+
+            List<GetNewsArticleDTO> showNewsArticles = _mapper.Map<List<GetNewsArticleDTO>>(newsArticles);
+            // Get the name of the user who created the article
+            foreach (GetNewsArticleDTO showNewsArticle in showNewsArticles)
+            {
+                showNewsArticle.CreatedByName = await GetCreatedNameByArticleId(showNewsArticle.NewsArticleId);
+            }
+
+            return showNewsArticles;
+        }
+        private async Task<string> GetCreatedNameByArticleId(string articleIds)
+        {
+            
+
+            NewsArticle? newsArticle = await _unitOfWork.GetRepository<NewsArticle>()
+                .Entities
+                .Where(na => na.NewsArticleId == articleIds)
+                .FirstOrDefaultAsync();
+
+            string? createdName = await _unitOfWork.GetRepository<SystemAccount>()
+                .Entities
+                .Where(sa => sa.AccountId == newsArticle.CreatedById)
+                .Select(sa => sa.AccountName)
+                .FirstOrDefaultAsync();
+
+            return createdName;
+        }
+        private async Task<string> GetUpdatedNameByArticleId(string articleIds)
+        {
+
+
+            NewsArticle? newsArticle = await _unitOfWork.GetRepository<NewsArticle>()
+                .Entities
+                .Where(na => na.NewsArticleId == articleIds)
+                .FirstOrDefaultAsync();
+
+            string? updatedName = await _unitOfWork.GetRepository<SystemAccount>()
+                .Entities
+                .Where(sa => sa.AccountId == newsArticle.UpdatedById)
+                .Select(sa => sa.AccountName)
+                .FirstOrDefaultAsync();
+
+            return updatedName;
         }
         private async Task<string> GenerateNewIdAsync()
         {
@@ -194,12 +250,7 @@ namespace BusinessLogic.Services
 
             return newId.ToString();
         }
-        //Temporary method to get categories
-        public async Task<IEnumerable<Category>> GetCategoriesAsync()
-        {
-            IGenericRepository<Category> repository = _unitOfWork.GetRepository<Category>();
-            return (await repository.GetAllAsync()).ToList();
-        }
+        
         
         // Get list of newsarticle
         public async Task<PaginatedList<GetNewsArticleDTO>> GetNewsArticles(int index, int pageSize, string? idSearch, string? titleSearch, string? headlineSearch)

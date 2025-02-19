@@ -10,6 +10,6 @@ namespace Repositories.DTOs.NewsArticleDTOs
         public string Headline { get; set; } = null!;
         public string NewsContent { get; set; } = null!;
         public string NewsSource { get; set; } = null!;
-        public List<Tag> Tags { get; set; } = new List<Tag>();
+        public List<NewsTag> NewsTags { get; set; } = new List<NewsTag>();
     }
 }

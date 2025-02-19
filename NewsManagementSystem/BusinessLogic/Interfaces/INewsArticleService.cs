@@ -18,7 +18,6 @@ namespace BusinessLogic.Interfaces
         Task InactiveNewsArticle(string id);
         Task<List<GetNewsArticleDTO>> GetActiveNewsArticle();
         Task<List<GetNewsArticleDTO>> GetNewsArticleAccordingToCreateById(short createById);
-        Task<IEnumerable<Category>> GetCategoriesAsync();
         
         Task<PaginatedList<GetNewsArticleDTO>> GetNewsArticles(int index, int pageSize, string? idSearch, string? titleSearch, string? headlineSearch);
     }

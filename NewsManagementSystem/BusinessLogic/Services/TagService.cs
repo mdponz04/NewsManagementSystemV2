@@ -6,22 +6,8 @@ using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
 using Repositories.DTOs.TagDTOs;
 using Repositories.Interface;
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using BusinessLogic.Interfaces;
-using Data.Constants;
-using Data.Entities;
-using Data.Enum;
-using Data.ExceptionCustom;
-using Microsoft.AspNetCore.Http;
-using Repositories.DTOs.SystemAccountDTOs;
-using Repositories.Interface;
 using Repositories.PaggingItem;
-using Repositories.DTOs.TagDTOs;
+
 
 namespace BusinessLogic.Services
 {

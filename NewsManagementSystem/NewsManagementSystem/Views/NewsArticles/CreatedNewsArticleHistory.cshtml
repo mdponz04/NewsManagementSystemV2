@@ -1,14 +1,13 @@
 ﻿@model IEnumerable<Repositories.DTOs.NewsArticleDTOs.GetNewsArticleDTO>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "CreatedNewsArticleHistory";
 }
 
 <h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
-    <a asp-action="CreatedNewsArticleHistory">View history of created news article</a>
 </p>
 <table class="table">
     <thead>
@@ -30,6 +29,9 @@
             </th>
             <th>
                 Modified date
+            </th>
+            <th>
+                Created user name
             </th>
             <th></th>
         </tr>
@@ -54,6 +56,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ModifyDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedByName)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.NewsArticleId">Edit</a>
