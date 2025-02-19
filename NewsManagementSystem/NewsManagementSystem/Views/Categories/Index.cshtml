@@ -43,9 +43,7 @@
                     @Html.DisplayFor(modelItem => item.IsActive)
                 </td>
                 <td>
-                    <a class="btn btn-primary" asp-action="Edit" asp-controller="Categories" asp-route-id="@item.CategoryId">
-                        Edit
-                    </a>
+<a class="btn btn-primary" href="javascript:void(0)" onclick="loadEditForm(@item.CategoryId)">Edit</a>
                     <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
                 </td>
             </tr>
@@ -109,12 +107,12 @@
         });
     }
 
-    function loadEditForm(id) {
-        $.get('/Categories/Edit/' + id, function (data) {
-            $('#editFormContainer').html(data);
-            $('#editModal').modal('show');
-        });
-    }
+function loadEditForm(id) {
+    $.get('/Categories/Edit/' + id, function (data) {
+        $('#editFormContainer').html(data);
+        $('#editModal').modal('show');
+    });
+}
 
     $(document).on("submit", "#createAccountForm", function (event) {
         event.preventDefault();

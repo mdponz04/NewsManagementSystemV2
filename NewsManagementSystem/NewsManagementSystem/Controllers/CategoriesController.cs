@@ -77,7 +77,6 @@ namespace NewsManagementSystem.Controllers
                 return NotFound();
             }
 
-            // Fetch category by id
             var categoryResult = await _categoryService.GetCategories(1, 1, id, null, null, null, null);
             if (categoryResult.Items.Count == 0)
             {
@@ -90,16 +89,13 @@ namespace NewsManagementSystem.Controllers
                 return NotFound();
             }
 
-            // Map to UpdateCategoryDTO (using AutoMapper or manual mapping)
             var updateCategoryDto = _mapper.Map<UpdateCategoryDTO>(getCategoryDto);
 
-            // If AJAX request, return the partial view for the modal
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 return PartialView("_EditCategoryPartial", updateCategoryDto);
             }
 
-            // Otherwise, return the full view
             return View(updateCategoryDto);
         }
 

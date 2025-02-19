@@ -2,12 +2,11 @@
 
 @{
     ViewData["Title"] = "Edit Category";
-    Layout = null; // This ensures the view renders without the full layout (ideal for modals)
+    Layout = null; // Render without the full layout for the modal
 }
 
 <form asp-action="Edit" method="post" id="editCategoryForm">
     @Html.AntiForgeryToken()
-    <!-- Hidden field for the Category ID -->
     <input type="hidden" id="CategoryId" name="CategoryID" value="@Model.CategoryID" />
 
     <div class="form-group">
@@ -22,8 +21,6 @@
         <span asp-validation-for="CategoryDescription" class="text-danger"></span>
     </div>
 
-    <!-- Additional fields (e.g., IsActive) can be added here -->
-
     <div class="mt-3">
         <button type="submit" class="btn btn-success">Save Changes</button>
         <a class="btn btn-secondary" data-dismiss="modal">Cancel</a>
@@ -34,15 +31,12 @@
     $('#editCategoryForm').submit(function (event) {
         event.preventDefault();
 
-        // Retrieve the antiforgery token
         var token = $('input[name="__RequestVerificationToken"]').val();
         var categoryId = $('#CategoryId').val();
 
-        // Build the data object from the form values
         var categoryData = {
             CategoryName: $('#CategoryName').val(),
             CategoryDescription: $('#CategoryDescription').val()
-            // Include additional properties if necessary
         };
 
         $.ajax({
@@ -56,7 +50,6 @@
             },
             success: function (response) {
                 if (response.success) {
-                    // Hide the modal and reload the page (or update the UI as needed)
                     $('#editModal').modal('hide');
                     location.reload();
                 } else {
@@ -71,5 +64,7 @@
 </script>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
