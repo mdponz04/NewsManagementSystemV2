@@ -33,21 +33,31 @@ namespace NewsManagementSystem.Controllers
 
         [AllowAnonymous]
         // GET: NewsArticles
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchQuery)
         {
             string? jwtTokenFromSession = HttpContext.Session.GetString("jwt_token");
 
             // Retrieve claims using the JWT token service
             string userRole = _jwtTokenService.GetRole(jwtTokenFromSession!);
 
+            List<GetNewsArticleDTO> newsArticles;
             if (userRole == "0" || userRole == "1") 
             {
-                var newsArticles = await _newsArticleService.GetAllNewsArticle();
+                newsArticles = await _newsArticleService.GetAllNewsArticle();
                 return View(newsArticles);
             }
+            else
+            {
+                newsArticles = await _newsArticleService.GetActiveNewsArticle();
+            }
 
-            var activeNewsArticles = await _newsArticleService.GetActiveNewsArticle();
-            return View(activeNewsArticles);
+            // Apply search filter if query is provided
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                newsArticles = await _newsArticleService.GetNewsArticleBySearchString(searchQuery);
+            }
+            
+            return View(newsArticles);
         }
         [Authorize]
         // GET: NewsArticles/Details/5

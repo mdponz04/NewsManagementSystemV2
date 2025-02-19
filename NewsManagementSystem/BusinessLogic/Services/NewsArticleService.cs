@@ -205,8 +205,6 @@ namespace BusinessLogic.Services
         }
         private async Task<string> GetCreatedNameByArticleId(string articleIds)
         {
-            
-
             NewsArticle? newsArticle = await _unitOfWork.GetRepository<NewsArticle>()
                 .Entities
                 .Where(na => na.NewsArticleId == articleIds)
@@ -222,8 +220,6 @@ namespace BusinessLogic.Services
         }
         private async Task<string> GetUpdatedNameByArticleId(string articleIds)
         {
-
-
             NewsArticle? newsArticle = await _unitOfWork.GetRepository<NewsArticle>()
                 .Entities
                 .Where(na => na.NewsArticleId == articleIds)
@@ -250,8 +246,16 @@ namespace BusinessLogic.Services
 
             return newId.ToString();
         }
-        
-        
+        public async Task<List<GetNewsArticleDTO>> GetNewsArticleBySearchString(string search)
+        {
+            List<NewsArticle> newsArticleList = await _unitOfWork.GetRepository<NewsArticle>()
+                .Entities
+                .Where(na => na.NewsTitle.Contains(search) && na.NewsStatus == true)
+                .ToListAsync();
+
+            return _mapper.Map<List<GetNewsArticleDTO>>(newsArticleList);
+        }
+
         // Get list of newsarticle
         public async Task<PaginatedList<GetNewsArticleDTO>> GetNewsArticles(int index, int pageSize, string? idSearch, string? titleSearch, string? headlineSearch)
         {

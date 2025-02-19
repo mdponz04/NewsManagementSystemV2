@@ -2,6 +2,7 @@
 using Data.Entities;
 using BusinessLogic.Interfaces;
 using Repositories.DTOs.TagDTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NewsManagementSystem.Controllers
 {
@@ -17,6 +18,7 @@ namespace NewsManagementSystem.Controllers
         }
 
         // GET: Tags
+        [Authorize(Roles = "0,1")]
         public async Task<IActionResult> Index()
         {
             var tags = await _tagService.GetAllTag();
@@ -24,6 +26,7 @@ namespace NewsManagementSystem.Controllers
         }
 
         // GET: Tags/Details/5
+        [Authorize(Roles = "0,1")]
         public async Task<IActionResult> Details(int id)
         {
             GetTagDTO tag = await _tagService.GetTagById(id);
@@ -36,6 +39,7 @@ namespace NewsManagementSystem.Controllers
         }
 
         // GET: Tags/Create
+        [Authorize(Roles = "0,1")]
         public IActionResult Create()
         {
             return View();
@@ -46,6 +50,7 @@ namespace NewsManagementSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "0,1")]
         public async Task<IActionResult> Create(PostTagDTO tag)
         {
             
@@ -54,6 +59,7 @@ namespace NewsManagementSystem.Controllers
         }
 
         // GET: Tags/Edit/5
+        [Authorize(Roles = "0,1")]
         public async Task<IActionResult> Edit(int id)
         {
             GetTagDTO tag = await _tagService.GetTagById(id);
@@ -69,6 +75,7 @@ namespace NewsManagementSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "0,1")]
         public async Task<IActionResult> Edit(int id, PutTagDTO tag)
         {
             if (id != tag.TagId)
@@ -81,6 +88,7 @@ namespace NewsManagementSystem.Controllers
         }
 
         // GET: Tags/Delete/5
+        [Authorize(Roles = "0,1")]
         public async Task<IActionResult> Delete(int id)
         {
             GetTagDTO tag = await _tagService.GetTagById(id);
@@ -95,15 +103,11 @@ namespace NewsManagementSystem.Controllers
         // POST: Tags/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "0,1")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _tagService.DeleteTag(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool TagExists(int id)
-        {
-            return _context.Tags.Any(e => e.TagId == id);
         }
     }
 }

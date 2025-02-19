@@ -4,6 +4,7 @@ using Data.Constants;
 using Data.Entities;
 using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Repositories.DTOs.TagDTOs;
 using Repositories.Interface;
 using Repositories.PaggingItem;
@@ -64,8 +65,13 @@ namespace BusinessLogic.Services
 
         public async Task DeleteTag(int id)
         {
+            if(await CheckIsTagInUseByTagId(id))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Tag is in use!");
+            }
             IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
             Tag? tag = await repository.GetByIdAsync(id);
+
             if (tag != null)
             {
                 repository.Delete(tag);
@@ -95,7 +101,15 @@ namespace BusinessLogic.Services
             }
             return tags;
         }
-        
+        private async Task<bool> CheckIsTagInUseByTagId(int id)
+        {
+            NewsTag? newsTag = await _unitOfWork
+                .GetRepository<NewsTag>()
+                .Entities
+                .Where(NewsTag => NewsTag.TagId == id)
+                .FirstOrDefaultAsync();
+            return newsTag != null;
+        }
         // Get list of system tag
         public async Task<PaginatedList<GetTagDTO>> GetTags(int index, int pageSize, int? idSearch, string? nameSearch, string? noteSearch)
         {
