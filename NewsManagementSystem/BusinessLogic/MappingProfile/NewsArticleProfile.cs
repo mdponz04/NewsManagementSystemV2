@@ -14,6 +14,8 @@ namespace BusinessLogic.MappingProfile
         public NewsArticleProfile()
         {
             CreateMap<NewsArticle, GetNewsArticleDTO>().ReverseMap();
+            CreateMap<NewsArticle, PostNewsArticleDTO>().ReverseMap();
+            CreateMap<NewsArticle, PutNewsArticleDTO>().ReverseMap();
         }
     }
 }

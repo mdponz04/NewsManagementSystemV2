@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NewsManagementSystem.styles.css" asp-append-version="true" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
@@ -26,9 +27,25 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="SystemAccounts" asp-action="Index">User</a>
-                        </li>
+                        @if(User.IsInRole("0")) // 0 is admin role
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="SystemAccounts" asp-action="Index">User</a>
+                            </li>
+                        }
+                        else if (User.Identity!.IsAuthenticated)
+                        {
+                        @using System.Security.Claims
+                            <li>
+                                @{
+                                    string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                                }
+                                @if (userId != null)
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="SystemAccounts" asp-action="Profile" asp-route-id="@userId">Profile</a>
+                                }
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Tags" asp-action="Index">Tag</a>
                         </li>
@@ -38,6 +55,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SecurePage">Secure Page</a>
                         </li>
+                        @* <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="NewsArticles" asp-action="Index">News</a>
+                        </li> *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Tags" asp-action="Index">Tags</a>
 
                         <!-- Show Login or Logout based on authentication -->
                         @if (Context.Session.GetString("jwt_token") != null)
@@ -55,6 +77,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">Login</a>
                             </li>
                         }
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="NewsArticles" asp-action="Index">News Article</a>
                         </li>
                     </ul>

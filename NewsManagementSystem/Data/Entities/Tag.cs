@@ -10,6 +10,6 @@ public partial class Tag
     public string? TagName { get; set; }
 
     public string? Note { get; set; }
+    public virtual ICollection<NewsTag> NewsTags { get; set; } = new List<NewsTag>();
 
-    public virtual ICollection<NewsArticle> NewsArticles { get; set; } = new List<NewsArticle>();
 }

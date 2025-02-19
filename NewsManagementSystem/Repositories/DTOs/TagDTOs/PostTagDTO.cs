@@ -1,6 +1,6 @@
 ﻿namespace Repositories.DTOs.TagDTOs
 {
-    public class GetTagDTO : BaseTagDTO
+    public class PostTagDTO : BaseTagDTO
     {
     }
 }

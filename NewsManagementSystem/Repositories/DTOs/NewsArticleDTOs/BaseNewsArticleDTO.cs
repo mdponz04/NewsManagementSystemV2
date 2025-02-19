@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Data.Entities;
 
 namespace Repositories.DTOs.NewsArticleDTOs
 {
     public class BaseNewsArticleDTO
     {
-        public string NewsTitle { get; set; } = string.Empty;
-        public string Headline { get; set; } = string.Empty;
-        public DateTime CreatedDate { get; set; }
-        public string NewsSource { get; set; } = string.Empty;
+        public short CategoryId { get; set; }
         public bool NewsStatus { get; set; }
-        public DateTime ModifiedName { get; set; }
-
+        public string NewsTitle { get; set; } = null!;
+        public string Headline { get; set; } = null!;
+        public string NewsContent { get; set; } = null!;
+        public string NewsSource { get; set; } = null!;
+        public List<NewsTag> NewsTags { get; set; } = new List<NewsTag>();
     }
 }

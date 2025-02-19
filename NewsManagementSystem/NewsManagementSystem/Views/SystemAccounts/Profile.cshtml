@@ -1,38 +1,48 @@
 ﻿@model Repositories.DTOs.SystemAccountDTOs.GetSystemAccountDTO
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = "Profile";
+    var userRole = ViewData["UserRole"] as string;
+    var userId = ViewData["UserId"] as string;
+    string adminRole = "0";
 }
 
-<h1>Details</h1>
+<h1>Profile</h1>
+    <div>
+        <h4>SystemAccount</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                Name
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.AccountName)
+            </dd>
+            <dt class="col-sm-2">
+                Email
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.AccountEmail)
+            </dd>
+            <dt class="col-sm-2">
+                Role
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.RoleName)
+            </dd>
+        </dl>
+    </div>
 
-<div>
-    <h4>SystemAccount</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            Name
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AccountName)
-        </dd>
-        <dt class = "col-sm-2">
-            Email
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AccountEmail)
-        </dd>
-        <dt class = "col-sm-2">
-            Role
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RoleName)
-        </dd>
-    </dl>
-</div>
+    <button type="button" class="btn btn-warning" onclick="loadEditForm(@Model.AccountId)">Edit</button>
+    @if (userRole!.Equals(adminRole))
+    {
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    } else
+    {
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back</a>
+    }
 
-<button type="button" class="btn btn-warning" onclick="loadEditForm(@Model.AccountId)">Edit</button>
-<a asp-action="Index" class="btn btn-secondary">Back to List</a>
 
 <!-- Modal for Edit Form -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -52,13 +62,10 @@
 @section Scripts {
     <script>
         function loadEditForm(id) {
-            $.get('/SystemAccounts/Edit/' + id, function (data) {
+            $.get('/SystemAccounts/Edit?id=' + id, function (data) {
                 $('#editFormContainer').html(data);
                 $('#editModal').modal('show');
             });
         }
     </script>
 }
-
-
-

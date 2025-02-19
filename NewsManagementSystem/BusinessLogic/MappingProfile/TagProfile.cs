@@ -1,3 +1,6 @@
+﻿using AutoMapper;
+using Data.Entities;
+using Repositories.DTOs.TagDTOs;
 ﻿using Data.Entities;
 using Repositories.DTOs.TagDTOs;
 using AutoMapper;
@@ -14,7 +17,8 @@ namespace BusinessLogic.MappingProfile
         public TagProfile()
         {
             CreateMap<Tag, GetTagDTO>().ReverseMap();
+            CreateMap<Tag, PostTagDTO>().ReverseMap();
+            CreateMap<Tag, PutTagDTO>().ReverseMap();
         }
-        
     }
 }

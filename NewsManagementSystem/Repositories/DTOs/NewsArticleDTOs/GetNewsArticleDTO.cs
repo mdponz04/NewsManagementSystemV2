@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Repositories.DTOs.NewsArticleDTOs
+﻿namespace Repositories.DTOs.NewsArticleDTOs
 {
     public class GetNewsArticleDTO : BaseNewsArticleDTO
     {
-        public short NewsArticleId { get; set; }
-        public string Category { get; set; } = string.Empty;
-        public string CreatedBy { get; set; } = string.Empty;
-        public string UpdatedBy { get; set; } = string.Empty;
+        public string? CreatedByName { get; set; }
+        public string? UpdatedByName { get; set; }
+        public string NewsArticleId { get; set; } = null!;
+        public short? CreatedById { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public short? UpdatedById { get; set; }
+        public DateTime? ModifyDate { get; set; }
     }
 }

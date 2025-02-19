@@ -1,126 +1,41 @@
-﻿@model Repositories.PaggingItem.PaginatedList<Repositories.DTOs.TagDTOs.GetTagDTO>
+﻿@model IEnumerable<Repositories.DTOs.TagDTOs.GetTagDTO>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<form asp-action="Search" method="get" class="mb-5">
-    <label for="nameSearch">Search:</label>
-    <input type="text" id="searchString" name="searchString" placeholder="Enter search...">
-    <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
-    <button type="submit">Search</button>
-</form>
-
 <h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                TagName
+                @Html.DisplayNameFor(model => model.TagName)
             </th>
             <th>
-                Note
+                @Html.DisplayNameFor(model => model.Note)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Items)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TagName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Note)
-                </td>
-                <td>
-                    <button class="btn btn-warning" onclick="loadEditForm(@item.TagId)">Edit</button> |
-                    <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.TagId">Profile</a> |
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.TagId">Delete</a>
-                </td>
-            </tr>
-        }
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TagName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.TagId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.TagId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.TagId">Delete</a>
+            </td>
+        </tr>
+}
     </tbody>
 </table>
-<div>
-    @if (Model.HasPreviousPage)
-    {
-        <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" class="btn btn-primary">Previous</a>
-    }
-
-    <span>Page @Model.PageNumber of @Model.TotalPages</span>
-
-    @if (Model.HasNextPage)
-    {
-        <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" class="btn btn-primary">Next</a>
-
-    }
-</div>
-
-<!-- Create Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create Account</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="createFormContainer">
-                <!-- Create form will be loaded here -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Account</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="editFormContainer">
-                <!-- Edit form will be loaded here -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function loadCreateForm() {
-        $.get('/Tags/Create', function (data) {
-            $('#createFormContainer').html(data);
-            $('#createModal').modal('show');
-        });
-    }
-
-    function loadEditForm(id) {
-        $.get('/Tags/Edit/' + id, function (data) {
-            $('#editFormContainer').html(data);
-            $('#editModal').modal('show');
-        });
-    }
-
-    $(document).on("submit", "#createAccountForm", function (event) {
-        event.preventDefault();
-        $.post('/Tags/Create', $(this).serialize(), function () {
-            $('#createModal').modal('hide');
-            location.reload();
-        });
-    });
-
-    $(document).on("submit", "#editAccountForm", function (event) {
-        event.preventDefault();
-        $.post('/Tags/Edit', $(this).serialize(), function () {
-            $('#editModal').modal('hide');
-            location.reload();
-        });
-    });
-</script>
-
