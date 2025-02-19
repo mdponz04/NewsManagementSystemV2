@@ -1,4 +1,5 @@
-﻿using BusinessLogic.Interfaces;
+﻿using AutoMapper;
+using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.DTOs.CategoryDTOs;
 using Repositories.PaggingItem;
@@ -8,9 +9,11 @@ namespace NewsManagementSystem.Controllers
     public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;
-        public CategoriesController(ICategoryService categoryService)
+        private readonly IMapper _mapper;
+        public CategoriesController(ICategoryService categoryService, IMapper mapper)
         {
             _categoryService = categoryService;
+            _mapper = mapper;
         }
 
         // GET: Categories
@@ -75,25 +78,35 @@ namespace NewsManagementSystem.Controllers
             }
 
             // Fetch category by id
-            var category = await _categoryService.GetCategories(1, 1, id, null, null, null, null);
-            if (category.Items.Count == 0)
+            var categoryResult = await _categoryService.GetCategories(1, 1, id, null, null, null, null);
+            if (categoryResult.Items.Count == 0)
             {
                 return NotFound();
             }
 
-            var categoryToUpdate = category.Items.FirstOrDefault();
-            if (categoryToUpdate == null)
+            var getCategoryDto = categoryResult.Items.FirstOrDefault();
+            if (getCategoryDto == null)
             {
                 return NotFound();
             }
 
-            return View(categoryToUpdate);
+            // Map to UpdateCategoryDTO (using AutoMapper or manual mapping)
+            var updateCategoryDto = _mapper.Map<UpdateCategoryDTO>(getCategoryDto);
+
+            // If AJAX request, return the partial view for the modal
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_EditCategoryPartial", updateCategoryDto);
+            }
+
+            // Otherwise, return the full view
+            return View(updateCategoryDto);
         }
 
         // POST: Edit Category
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, UpdateCategoryDTO categoryDto)
+        public async Task<IActionResult> Edit(short id, [FromBody] UpdateCategoryDTO categoryDto)
         {
             if (id <= 0 || categoryDto == null)
             {
@@ -102,16 +115,27 @@ namespace NewsManagementSystem.Controllers
 
             if (ModelState.IsValid)
             {
-                // Update category
+                // Update category using the service
                 await _categoryService.UpdateCategory(id, categoryDto);
-                return RedirectToAction(nameof(Index)); // Redirect to index after successful update
+
+                // Return JSON response if AJAX request
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = true });
+                }
+                return RedirectToAction(nameof(Index));
             }
 
+            // If validation fails, return JSON error response for AJAX requests
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Json(new { success = false, error = "Validation failed" });
+            }
             return View(categoryDto);
         }
 
         // GET: Delete Category
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(short id)
         {
             if (id <= 0)
             {
@@ -138,7 +162,7 @@ namespace NewsManagementSystem.Controllers
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(short id)
         {
             if (id <= 0)
             {

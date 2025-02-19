@@ -125,7 +125,7 @@ namespace BusinessLogic.Services
 
             return _mapper.Map<CreateCategoryDTO>(category);
         }
-        public async Task<UpdateCategoryDTO> UpdateCategory(int categoryId, UpdateCategoryDTO categoryDto)
+        public async Task<UpdateCategoryDTO> UpdateCategory(short categoryId, UpdateCategoryDTO categoryDto)
         {
             if (categoryDto == null || categoryId <= 0)
             {
@@ -152,7 +152,7 @@ namespace BusinessLogic.Services
         }
 
         // Delete an existing category
-        public async Task<bool> DeleteCategory(int categoryId)
+        public async Task<bool> DeleteCategory(short categoryId)
         {
             if (categoryId <= 0)
             {

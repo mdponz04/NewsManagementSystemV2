@@ -27,7 +27,11 @@ namespace BusinessLogic.MappingProfile
             CreateMap<Category, UpdateCategoryDTO>()
                 .ForMember(dest => dest.CategoryDescription, opt => opt.MapFrom(src => src.CategoryDesciption))
                 .ReverseMap()
-                .ForMember(dest => dest.CategoryDesciption, opt => opt.MapFrom(src => src.CategoryDescription));
+                .ForMember(dest => dest.CategoryDesciption, opt => opt.MapFrom(src => src.CategoryDescription))    
+                .ForMember(dest => dest.CategoryId, opt => opt.Ignore());
+
+            CreateMap<GetCategoryDTO, UpdateCategoryDTO>();
+
         }
     }
 }

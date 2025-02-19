@@ -43,8 +43,9 @@
                     @Html.DisplayFor(modelItem => item.IsActive)
                 </td>
                 <td>
-                    <button class="btn btn-warning" onclick="loadEditForm(@item.CategoryId)">Edit</button> |
-                    <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.CategoryId">Profile</a> |
+                    <a class="btn btn-primary" asp-action="Edit" asp-controller="Categories" asp-route-id="@item.CategoryId">
+                        Edit
+                    </a>
                     <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
                 </td>
             </tr>

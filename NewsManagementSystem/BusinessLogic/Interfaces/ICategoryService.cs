@@ -15,7 +15,7 @@ namespace BusinessLogic.Interfaces
         Task<PaginatedList<GetCategoryDTO>> GetCategories(int index, int pageSize, int? idSearch, string? nameSearch, string? descriptionSearch, int? parentIdSearch, bool? isActiveSearch);
 
         Task<CreateCategoryDTO> CreateCategory(CreateCategoryDTO categoryDto);
-        Task<UpdateCategoryDTO> UpdateCategory(int categoryId, UpdateCategoryDTO categoryDto);
-        Task<bool> DeleteCategory(int categoryId);
+        Task<UpdateCategoryDTO> UpdateCategory(short categoryId, UpdateCategoryDTO categoryDto);
+        Task<bool> DeleteCategory(short categoryId);
     }
 }
