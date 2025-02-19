@@ -37,6 +37,16 @@ namespace BusinessLogic.Services
             IEnumerable<Category> categories = await query.ToListAsync();
             return _mapper.Map<IEnumerable<GetCategoryDTO>>(categories);
         }
+        public async Task<GetCategoryDTO> GetCategoryById(short id)
+        {
+            Category? category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
+            if (category == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Category not found!");
+            }
+            GetCategoryDTO responseItem = _mapper.Map<GetCategoryDTO>(category);
+            return responseItem;
+        }
 
         // Get list of system tag
         public async Task<PaginatedList<GetCategoryDTO>> GetCategories(int index, int pageSize, int? idSearch, string? nameSearch, string? descriptionSearch, int? parentIdSearch, bool? isActiveSearch)
