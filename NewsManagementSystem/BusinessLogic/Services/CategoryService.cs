@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Services
 {
@@ -28,6 +29,13 @@ namespace BusinessLogic.Services
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+        }
+        public async Task<IEnumerable<GetCategoryDTO>> GetAllCategories()
+        {
+            IQueryable<Category> query = _unitOfWork.GetRepository<Category>().Entities;
+            query = query.OrderBy(c => c.CategoryName);
+            IEnumerable<Category> categories = await query.ToListAsync();
+            return _mapper.Map<IEnumerable<GetCategoryDTO>>(categories);
         }
 
         // Get list of system tag

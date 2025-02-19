@@ -10,6 +10,7 @@ namespace BusinessLogic.Interfaces
 {
     public interface ICategoryService
     {
+        Task<IEnumerable<GetCategoryDTO>> GetAllCategories();
         Task<PaginatedList<GetCategoryDTO>> GetCategories(int index, int pageSize, int? idSearch, string? nameSearch, string? descriptionSearch, int? parentIdSearch, bool? isActiveSearch);
 
         Task<CreateCategoryDTO> CreateCategory(CreateCategoryDTO categoryDto);
