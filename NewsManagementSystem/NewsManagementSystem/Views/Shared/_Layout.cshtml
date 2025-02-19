@@ -27,6 +27,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        
                         @if(User.IsInRole("0")) // 0 is admin role
                         {
                             <li class="nav-item">
@@ -49,9 +50,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Tags" asp-action="Index">Tag</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Category</a>
-                        </li>
+                        @if (User.IsInRole("1"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Category</a>
+                            </li>
+                        }                  
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SecurePage">Secure Page</a>
                         </li>
