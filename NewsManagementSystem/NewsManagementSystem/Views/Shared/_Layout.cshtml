@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NewsManagementSystem.styles.css" asp-append-version="true" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
@@ -26,15 +27,67 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        
+                        @if(User.IsInRole("0")) // 0 is admin role
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="SystemAccounts" asp-action="Index">User</a>
+                            </li>
+                        }
+                        else if (User.Identity!.IsAuthenticated)
+                        {
+                        @using System.Security.Claims
+                            <li>
+                                @{
+                                    string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                                }
+                                @if (userId != null)
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="SystemAccounts" asp-action="Profile" asp-route-id="@userId">Profile</a>
+                                }
+                            </li>
+                        }
+                        @if (User.IsInRole("1"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tags" asp-action="Index">Tag</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("1"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Category</a>
+                            </li>
+                        }                  
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="SystemAccounts" asp-action="Index">User</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SecurePage">Secure Page</a>
                         </li>
 
+                        <!-- Show Login or Logout based on authentication -->
+                        @if (Context.Session.GetString("jwt_token") != null)
+                        {
+                            <form action="/Auth/Logout" method="post" class="nav-item-logout">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="nav-link text-dark btn btn-link" style="border: none; background: none;">
+                                    Logout
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">Login</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="NewsArticles" asp-action="Index">News Article</a>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -46,11 +99,13 @@
             &copy; 2025 - NewsManagementSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <script>
         $(document).ready(function () {
             var errorMessage = '@TempData["ErrorMessage"]';
@@ -62,7 +117,7 @@
             if (successMessage) {
                 toastr.success(successMessage);
             }
-        });
+                });
     </script>
 </body>
 </html>

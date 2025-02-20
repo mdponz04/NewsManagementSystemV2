@@ -65,27 +65,6 @@ public partial class NewsManagementDbContext : DbContext
                 .HasForeignKey(d => d.CreatedById)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_NewsArticle_SystemAccount");
-
-            entity.HasMany(d => d.Tags).WithMany(p => p.NewsArticles)
-                .UsingEntity<Dictionary<string, object>>(
-                    "NewsTag",
-                    r => r.HasOne<Tag>().WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_NewsTag_Tag"),
-                    l => l.HasOne<NewsArticle>().WithMany()
-                        .HasForeignKey("NewsArticleId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_NewsTag_NewsArticle"),
-                    j =>
-                    {
-                        j.HasKey("NewsArticleId", "TagId");
-                        j.ToTable("NewsTag");
-                        j.IndexerProperty<string>("NewsArticleId")
-                            .HasMaxLength(20)
-                            .HasColumnName("NewsArticleID");
-                        j.IndexerProperty<int>("TagId").HasColumnName("TagID");
-                    });
         });
 
         modelBuilder.Entity<SystemAccount>(entity =>
@@ -114,6 +93,32 @@ public partial class NewsManagementDbContext : DbContext
             entity.Property(e => e.Note).HasMaxLength(400);
             entity.Property(e => e.TagName).HasMaxLength(50);
         });
+
+        modelBuilder.Entity<NewsTag>(entity =>
+        {
+            entity.ToTable("NewsTag");
+
+            entity.HasKey(e => new { e.NewsArticleId, e.TagId });
+
+            entity.Property(e => e.NewsArticleId)
+                .HasMaxLength(20)
+                .HasColumnName("NewsArticleID");
+
+            entity.Property(e => e.TagId).HasColumnName("TagID");
+
+            entity.HasOne(d => d.NewsArticle)
+                .WithMany(p => p.NewsTags)
+                .HasForeignKey(d => d.NewsArticleId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_NewsTag_NewsArticle");
+
+            entity.HasOne(d => d.Tag)
+                .WithMany(p => p.NewsTags)
+                .HasForeignKey(d => d.TagId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_NewsTag_Tag");
+        });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

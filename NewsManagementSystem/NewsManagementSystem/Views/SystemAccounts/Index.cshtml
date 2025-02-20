@@ -7,58 +7,77 @@
 
 <h1>Index</h1>
 
-<button type="button" class="btn btn-primary" onclick="loadCreateForm()">Create Account</button>
+<form asp-action="Search" method="get" class="mb-5">
+    <label for="nameSearch">Search:</label>
+    <input type="text" id="searchNameString" name="searchNameString" placeholder="Enter name...">
+    <input type="text" id="searchEmailString" name="searchEmailString" placeholder="Enter email...">
+    <label for="searchRoleString">Role:</label>
+    <select id="searchRoleString" name="searchRoleString">
+        <option value="">All</option>
+        <option value="Staff">Staff</option>
+        <option value="Lecturer">Lecturer</option>
+    </select>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                FullName
-            </th>
-            <th>
-                Email
-            </th>
-            <th>
-                Role
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Items) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoleName)
-            </td>
-            <td>
-                <button class="btn btn-warning" onclick="loadEditForm(@item.AccountId)">Edit</button> |
-                <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.AccountId">Profile</a> |
-                <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.AccountId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-<div>
-    @if (Model.HasPreviousPage)
-    {
-        <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" class="btn btn-primary">Previous</a>
-    }
 
-    <span>Page @Model.PageNumber of @Model.TotalPages</span>
+        <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
 
-    @if (Model.HasNextPage)
-    {
-        <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" class="btn btn-primary">Next</a>
+        <button type="submit">Search</button>
+    </form>
 
-    }
-</div>
+
+    <button type="button" class="btn btn-primary" onclick="loadCreateForm()">Create Account</button>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    FullName
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Role
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AccountName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AccountEmail)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RoleName)
+                    </td>
+                    <td>
+                    <button class="btn btn-warning" onclick="loadEditForm(@item.AccountId, this)">Edit</button> |
+                        <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.AccountId">Profile</a> |
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.AccountId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        @if (Model.HasPreviousPage)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" class="btn btn-primary">Previous</a>
+        }
+
+        <span>Page @Model.PageNumber of @Model.TotalPages</span>
+
+        @if (Model.HasNextPage)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" class="btn btn-primary">Next</a>
+
+        }
+    </div>
 
 <!-- Create Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
@@ -102,13 +121,6 @@
         });
     }
 
-    function loadEditForm(id) {
-        $.get('/SystemAccounts/Edit/' + id, function (data) {
-            $('#editFormContainer').html(data);
-            $('#editModal').modal('show');
-        });
-    }
-
     $(document).on("submit", "#createAccountForm", function (event) {
         event.preventDefault();
         $.post('/SystemAccounts/Create', $(this).serialize(), function () {
@@ -117,11 +129,19 @@
         });
     });
 
-    $(document).on("submit", "#editAccountForm", function (event) {
-        event.preventDefault();
-        $.post('/SystemAccounts/Edit', $(this).serialize(), function () {
-            $('#editModal').modal('hide');
-            location.reload();
+    function loadEditForm(id, button) { // Pass the button element
+        $.get('/SystemAccounts/Edit?id=' + id, function (data) {
+            $('#editFormContainer').html(data);
+            $('#editModal').modal('show');
+
+            // Attach submit handler *after* form is loaded (using .off to prevent duplicates)
+            $('#editAccountForm').off('submit').on('submit', function (event) {
+                event.preventDefault();
+                $.post($(this).attr('action'), $(this).serialize(), function () {
+                    $('#editModal').modal('hide');
+                    location.reload();
+                });
+            });
         });
-    });
+    }
 </script>

@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Repositories.DTOs.NewsArticleDTOs.GetNewsArticleDTO>
+
+@{
+    ViewData["Title"] = "CreatedNewsArticleHistory";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                News title
+            </th>
+            <th>
+                Headline
+            </th>
+            <th>
+                News content
+            </th>
+            <th>
+                News source
+            </th>
+            <th>
+                Created date
+            </th>
+            <th>
+                Modified date
+            </th>
+            <th>
+                Created user name
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NewsTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Headline)
+            </td>
+            <td>
+		        @Html.DisplayFor(modelItem => item.NewsContent)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NewsSource)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ModifyDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedByName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.NewsArticleId">Edit</a>
+                <br />
+                <a asp-action="Details" asp-route-id="@item.NewsArticleId">Details</a>
+                <br />
+                <a asp-action="Delete" asp-route-id="@item.NewsArticleId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
