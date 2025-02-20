@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Repositories.DTOs.CategoryDTOs;
-using Repositories.PaggingItem;
+using Data.DTOs.CategoryDTOs;
+using Data.PaggingItem;
 
 namespace NewsManagementSystem.Controllers
 {

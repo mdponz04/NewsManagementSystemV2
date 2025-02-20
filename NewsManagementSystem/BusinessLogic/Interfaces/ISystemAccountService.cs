@@ -1,6 +1,6 @@
 ﻿using Data.Enum;
-using Repositories.DTOs.SystemAccountDTOs;
-using Repositories.PaggingItem;
+using Data.DTOs.SystemAccountDTOs;
+using Data.PaggingItem;
 
 namespace BusinessLogic.Interfaces
 {

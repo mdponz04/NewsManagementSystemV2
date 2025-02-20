@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BusinessLogic.Interfaces;
-using Repositories.DTOs.NewsArticleDTOs;
-using Repositories.DTOs.TagDTOs;
+using Data.DTOs.NewsArticleDTOs;
+using Data.DTOs.TagDTOs;
 using Data.Entities;
-using Repositories.DTOs.CategoryDTOs;
+using Data.DTOs.CategoryDTOs;
 using Microsoft.AspNetCore.Authorization;
 
 

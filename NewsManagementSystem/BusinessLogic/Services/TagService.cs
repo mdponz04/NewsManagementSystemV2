@@ -5,9 +5,9 @@ using Data.Entities;
 using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Repositories.DTOs.TagDTOs;
-using Repositories.Interface;
-using Repositories.PaggingItem;
+using Data.DTOs.TagDTOs;
+using Data.Interface;
+using Data.PaggingItem;
 
 
 namespace BusinessLogic.Services

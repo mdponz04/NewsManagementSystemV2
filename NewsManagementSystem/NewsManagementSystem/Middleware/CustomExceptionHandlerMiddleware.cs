@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Data.ExceptionCustom;
-using Repositories.Interface;
+using Data.Interface;
 
 namespace NewsManagementSystem.Middleware;
 

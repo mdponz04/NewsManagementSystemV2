@@ -1,6 +1,6 @@
 ﻿using Data.Entities;
-using Repositories.DTOs.TagDTOs;
-using Repositories.PaggingItem;
+using Data.DTOs.TagDTOs;
+using Data.PaggingItem;
 using System;
 using System.Collections.Generic;
 using System.Linq;

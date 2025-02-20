@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Data.Entities;
-using Repositories.DTOs.CategoryDTOs;
-using Repositories.DTOs.TagDTOs;
+using Data.DTOs.CategoryDTOs;
+using Data.DTOs.TagDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

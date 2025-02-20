@@ -7,9 +7,9 @@ using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Repositories.DTOs.SystemAccountDTOs;
-using Repositories.Interface;
-using Repositories.PaggingItem;
+using Data.DTOs.SystemAccountDTOs;
+using Data.Interface;
+using Data.PaggingItem;
 
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
