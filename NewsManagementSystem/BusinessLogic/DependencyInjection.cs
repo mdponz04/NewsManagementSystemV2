@@ -19,6 +19,8 @@ public static class DependencyInjection
         services.AddRepository();
         services.AddAutoMapper();
         services.AddServices(configuration);
+
+
     }
 
     public static void AddRepository(this IServiceCollection services)

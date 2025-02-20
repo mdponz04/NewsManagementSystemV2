@@ -27,6 +27,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        
                         @if(User.IsInRole("0")) // 0 is admin role
                         {
                             <li class="nav-item">
@@ -46,23 +47,21 @@
                                 }
                             </li>
                         }
-                        @if (User.Identity!.IsAuthenticated && User.IsInRole("1"))
+                        @if (User.IsInRole("1"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Tags" asp-action="Index">Tag</a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Category</a>
-                        </li>
+                        @if (User.IsInRole("1"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Category</a>
+                            </li>
+                        }                  
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SecurePage">Secure Page</a>
                         </li>
-                        @* <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="NewsArticles" asp-action="Index">News</a>
-                        </li> *@
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Tags" asp-action="Index">Tags</a>
 
                         <!-- Show Login or Logout based on authentication -->
                         @if (Context.Session.GetString("jwt_token") != null)

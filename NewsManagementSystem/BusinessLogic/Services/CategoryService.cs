@@ -7,6 +7,11 @@ using Repositories.DTOs.CategoryDTOs;
 using Repositories.Interface;
 using Repositories.PaggingItem;
 using BusinessLogic.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Services
@@ -24,6 +29,23 @@ namespace BusinessLogic.Services
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+        }
+        public async Task<IEnumerable<GetCategoryDTO>> GetAllCategories()
+        {
+            IQueryable<Category> query = _unitOfWork.GetRepository<Category>().Entities;
+            query = query.OrderBy(c => c.CategoryName);
+            IEnumerable<Category> categories = await query.ToListAsync();
+            return _mapper.Map<IEnumerable<GetCategoryDTO>>(categories);
+        }
+        public async Task<GetCategoryDTO> GetCategoryById(short id)
+        {
+            Category? category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
+            if (category == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Category not found!");
+            }
+            GetCategoryDTO responseItem = _mapper.Map<GetCategoryDTO>(category);
+            return responseItem;
         }
 
         // Get list of system tag
@@ -86,23 +108,72 @@ namespace BusinessLogic.Services
 
             return paginatedList;
         }
-        public async Task<IEnumerable<GetCategoryDTO>> GetAllCategories()
+
+
+        // Create a new category
+        public async Task<CreateCategoryDTO> CreateCategory(CreateCategoryDTO categoryDto)
         {
-            IQueryable<Category> query = _unitOfWork.GetRepository<Category>().Entities;
-            query = query.OrderBy(c => c.CategoryName);
-            IEnumerable<Category> categories = await query.ToListAsync();
-            return _mapper.Map<IEnumerable<GetCategoryDTO>>(categories);
+            if (categoryDto == null)
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Category data is required!");
+            }
+
+            Category category = _mapper.Map<Category>(categoryDto);
+
+            await _unitOfWork.GetRepository<Category>().InsertAsync(category);
+            await _unitOfWork.SaveAsync();
+
+            return _mapper.Map<CreateCategoryDTO>(category);
         }
-        // Get category by id
-        public async Task<GetCategoryDTO> GetCategoryById(short id)
+        public async Task<UpdateCategoryDTO> UpdateCategory(short categoryId, UpdateCategoryDTO categoryDto)
         {
-            Category? category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
+            if (categoryDto == null || categoryId <= 0)
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Invalid category data or category ID!");
+            }
+
+            // Find the category by id
+            Category category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(categoryId);
+
             if (category == null)
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Category not found!");
             }
-            GetCategoryDTO responseItem = _mapper.Map<GetCategoryDTO>(category);
-            return responseItem;
+
+            // Map the updated fields to the category entity
+            _mapper.Map(categoryDto, category);
+
+            // Update the category in the database
+            _unitOfWork.GetRepository<Category>().Update(category);
+            await _unitOfWork.SaveAsync();
+
+            // Return the updated category
+            return _mapper.Map<UpdateCategoryDTO>(category);
         }
+
+        // Delete an existing category
+        public async Task<bool> DeleteCategory(short categoryId)
+        {
+            if (categoryId <= 0)
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Invalid category ID!");
+            }
+
+            // Find the category by id
+            Category category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(categoryId);
+
+            if (category == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Category not found!");
+            }
+
+            // Remove the category from the database
+            await _unitOfWork.GetRepository<Category>().DeleteAsync(category);
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
+
+
     }
 }

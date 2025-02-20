@@ -11,6 +11,8 @@
     <button type="submit">Search</button>
 </form>
 
+<button type="button" class="btn btn-primary" onclick="loadCreateForm()">Create Account</button>
+
 <h1>Index</h1>
 <table class="table">
     <thead>
@@ -41,8 +43,7 @@
                     @Html.DisplayFor(modelItem => item.IsActive)
                 </td>
                 <td>
-                    <button class="btn btn-warning" onclick="loadEditForm(@item.CategoryId)">Edit</button> |
-                    <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.CategoryId">Profile</a> |
+<a class="btn btn-primary" href="javascript:void(0)" onclick="loadEditForm(@item.CategoryId)">Edit</a>
                     <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
                 </td>
             </tr>
@@ -106,12 +107,12 @@
         });
     }
 
-    function loadEditForm(id) {
-        $.get('/Categories/Edit/' + id, function (data) {
-            $('#editFormContainer').html(data);
-            $('#editModal').modal('show');
-        });
-    }
+function loadEditForm(id) {
+    $.get('/Categories/Edit/' + id, function (data) {
+        $('#editFormContainer').html(data);
+        $('#editModal').modal('show');
+    });
+}
 
     $(document).on("submit", "#createAccountForm", function (event) {
         event.preventDefault();
@@ -129,4 +130,3 @@
         });
     });
 </script>
-

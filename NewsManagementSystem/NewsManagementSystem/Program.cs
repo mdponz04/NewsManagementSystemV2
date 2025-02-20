@@ -11,6 +11,9 @@ builder.Services.AddSession(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddAntiforgery(options => {
+    options.HeaderName = "RequestVerificationToken";
+});
 
 // Add logging
 builder.Services.AddLogging(config =>
@@ -73,6 +76,6 @@ app.UseAuthorization();  // Enables authorization
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=Login}");
+    pattern: "{controller=Auth}/{action=Login}/{id?}");
 
 app.Run();
