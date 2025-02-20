@@ -59,9 +59,9 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Category</a>
                             </li>
                         }                  
-                        <li class="nav-item">
+@*                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SecurePage">Secure Page</a>
-                        </li>
+                        </li> *@
 
                         <!-- Show Login or Logout based on authentication -->
                         @if (Context.Session.GetString("jwt_token") != null)
