@@ -31,7 +31,7 @@ namespace BusinessLogic.MappingProfile
                 .ForMember(dest => dest.CategoryId, opt => opt.Ignore());
 
             CreateMap<GetCategoryDTO, UpdateCategoryDTO>();
-
+               
         }
     }
 }

@@ -94,7 +94,13 @@ namespace BusinessLogic.Services
             // Map user entities to user dto
             IReadOnlyCollection<GetCategoryDTO> responseItems = resultQuery.Items.Select(item =>
             {
-                GetCategoryDTO responseItem = _mapper.Map<GetCategoryDTO>(item);
+                //GetCategoryDTO responseItem = _mapper.Map<GetCategoryDTO>(item);
+                GetCategoryDTO responseItem = new GetCategoryDTO();
+                responseItem.CategoryId = item.CategoryId;
+                responseItem.CategoryName = item.CategoryName;
+                responseItem.ParentCategoryId = item.CategoryId;
+                responseItem.CategoryDescription = item.CategoryDesciption;
+                responseItem.IsActive = true;
 
                 return responseItem;
             }).ToList();
