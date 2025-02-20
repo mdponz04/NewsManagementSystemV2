@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.Interfaces;
 using Data.Entities;
-using Repositories.Interface;
+using Data.Interface;
 
 namespace BusinessLogic.Services
 {

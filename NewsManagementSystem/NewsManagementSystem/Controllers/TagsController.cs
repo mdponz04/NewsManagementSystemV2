@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Data.Entities;
 using BusinessLogic.Interfaces;
-using Repositories.DTOs.TagDTOs;
+using Data.DTOs.TagDTOs;
 using Microsoft.AspNetCore.Authorization;
 
 namespace NewsManagementSystem.Controllers

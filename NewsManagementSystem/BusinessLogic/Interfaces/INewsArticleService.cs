@@ -1,5 +1,5 @@
-﻿using Repositories.DTOs.NewsArticleDTOs;
-using Repositories.PaggingItem;
+﻿using Data.DTOs.NewsArticleDTOs;
+using Data.PaggingItem;
 using System;
 using System.Collections.Generic;
 using System.Linq;

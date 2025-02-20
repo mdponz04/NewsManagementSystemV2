@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Data.Entities;
-using Repositories.DTOs.SystemAccountDTOs;
+using Data.DTOs.SystemAccountDTOs;
 
 namespace BusinessLogic.MappingProfile
 {

@@ -1,5 +1,5 @@
-﻿using Repositories.DTOs.CategoryDTOs;
-using Repositories.PaggingItem;
+﻿using Data.DTOs.CategoryDTOs;
+using Data.PaggingItem;
 using System;
 using System.Collections.Generic;
 using System.Linq;

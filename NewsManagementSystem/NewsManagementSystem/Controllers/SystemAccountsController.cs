@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Repositories.DTOs.SystemAccountDTOs;
-using Repositories.PaggingItem;
+using Data.DTOs.SystemAccountDTOs;
+using Data.PaggingItem;
 using BusinessLogic.Interfaces;
 using Data.Enum;
 using Microsoft.AspNetCore.Authorization;
