@@ -1,3 +1,6 @@
+using BusinessLogic;
+using Data.Entities;
+using Microsoft.EntityFrameworkCore;
 namespace RazorPage
 {
     public class Program
@@ -5,9 +8,20 @@ namespace RazorPage
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDbContext<NewsManagementDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddApplication(builder.Configuration);
+
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             var app = builder.Build();
 
@@ -23,6 +37,9 @@ namespace RazorPage
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseAuthentication();
+
+            app.UseSession();
 
             app.UseAuthorization();
 

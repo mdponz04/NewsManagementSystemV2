@@ -1,0 +1,30 @@
+﻿@page
+@model RazorPage.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h2>Login</h2>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="LoginDTO.AccountEmail">Email</label>
+        <input asp-for="LoginDTO.AccountEmail" class="form-control" />
+        <span asp-validation-for="LoginDTO.AccountEmail" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="LoginDTO.AccountPassword">Password</label>
+        <input asp-for="LoginDTO.AccountPassword" type="password" class="form-control" />
+        <span asp-validation-for="LoginDTO.AccountPassword" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
