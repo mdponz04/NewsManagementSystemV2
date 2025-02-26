@@ -53,6 +53,7 @@ namespace RazorPage.Pages.Categories
             try
             {
                 await _categoryService.DeleteCategory(Category.CategoryId);
+                TempData["SuccessMessage"] = "Category deleted successfully!";
                 return RedirectToPage("Index"); // Redirect if deletion is successful
             }
             catch (ErrorException ex)

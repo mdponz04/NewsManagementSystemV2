@@ -101,6 +101,37 @@
     </div>
 </div>
 
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="modal fade show" id="successModal" tabindex="-1" aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-success">Success</h5>
+                    <button type="button" class="btn-close" onclick="closeSuccessModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@TempData["SuccessMessage"]</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeSuccessModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function closeSuccessModal() {
+            document.getElementById("successModal").style.display = "none";
+        }
+
+        // Auto-hide success modal after 3 seconds
+        setTimeout(closeSuccessModal, 3000);
+    </script>
+}
+
+
 <script>
     function loadCreateForm() {
         $.get('/Categories/Create', function (data) {
