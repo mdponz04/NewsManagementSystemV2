@@ -173,6 +173,14 @@ namespace BusinessLogic.Services
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Category not found!");
             }
 
+            // The delete action will delete an item in the case this item is not belong to any news articles
+            bool hasNewsArticle = await _unitOfWork.GetRepository<NewsArticle>().Entities.AnyAsync(p => p.CategoryId == categoryId);
+
+            if (hasNewsArticle)
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Cannot delete category that is already in use.");
+            }
+
             // Remove the category from the database
             await _unitOfWork.GetRepository<Category>().DeleteAsync(category);
             await _unitOfWork.SaveAsync();

@@ -46,7 +46,7 @@
                 </td>
                 <td>
                     <a class="btn btn-primary" href="javascript:void(0)" onclick="loadEditForm(@item.CategoryId)">Edit</a>
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+                    <a class="btn btn-danger" asp-page="./Delete" asp-route-id="@item.CategoryId">Delete</a>
                 </td>
             </tr>
         }
