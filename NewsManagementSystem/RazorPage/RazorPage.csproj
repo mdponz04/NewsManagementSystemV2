@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
+    <ProjectReference Include="..\NewsManagementSystem\NewsManagementSystem.csproj" />
   </ItemGroup>
 
 </Project>
