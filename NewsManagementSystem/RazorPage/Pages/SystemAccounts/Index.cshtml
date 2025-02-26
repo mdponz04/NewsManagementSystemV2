@@ -1,4 +1,5 @@
-﻿@model Data.PaggingItem.PaginatedList<Data.DTOs.SystemAccountDTOs.GetSystemAccountDTO>
+﻿@page
+@model RazorPage.Pages.SystemAccounts.IndexModel
 
 
 @{
@@ -19,31 +20,32 @@
     </select>
 
 
-        <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
+    <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
 
-        <button type="submit">Search</button>
-    </form>
+    <button type="submit">Search</button>
+</form>
 
 
-    <button type="button" class="btn btn-primary" onclick="loadCreateForm()">Create Account</button>
+<button type="button" class="btn btn-primary" onclick="loadCreateForm()">Create Account</button>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    FullName
-                </th>
-                <th>
-                    Email
-                </th>
-                <th>
-                    Role
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Items)
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                FullName
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Role
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.SystemAccounts != null) {
+            @foreach (var item in Model.SystemAccounts.Items)
             {
                 <tr>
                     <td>
@@ -56,28 +58,31 @@
                         @Html.DisplayFor(modelItem => item.RoleName)
                     </td>
                     <td>
-                    <button class="btn btn-warning" onclick="loadEditForm(@item.AccountId, this)">Edit</button> |
-                    <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.AccountId">Profile</a> |
-                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.AccountId">Delete</a>
+                        <button class="btn btn-warning" onclick="loadEditForm(@item.AccountId, this)">Edit</button> |
+                        <a class="btn btn-info" asp-page="./Profile" asp-route-id="@item.AccountId">Profile</a> |
+                        <a class="btn btn-danger" asp-page="./Delete" asp-route-id="@item.AccountId">Delete</a>
                     </td>
                 </tr>
             }
-        </tbody>
-    </table>
-    <div>
-        @if (Model.HasPreviousPage)
+        }
+    </tbody>
+</table>
+<div>
+    @if (Model.SystemAccounts != null){
+        @if (Model.SystemAccounts.HasPreviousPage)
         {
-            <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" class="btn btn-primary">Previous</a>
+            <a asp-page="./Index" asp-route-pageNumber="@(Model.SystemAccounts.PageNumber - 1)" class="btn btn-primary">Previous</a>
         }
 
-        <span>Page @Model.PageNumber of @Model.TotalPages</span>
+        <span>Page @Model.SystemAccounts.PageNumber of @Model.SystemAccounts.TotalPages</span>
 
-        @if (Model.HasNextPage)
+        @if (Model.SystemAccounts.HasNextPage)
         {
-            <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" class="btn btn-primary">Next</a>
+            <a asp-page="./Index" asp-route-pageNumber="@(Model.SystemAccounts.PageNumber + 1)" class="btn btn-primary">Next</a>
 
         }
-    </div>
+    }
+</div>
 
 <!-- Create Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">

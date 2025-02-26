@@ -1,3 +1,7 @@
+using BusinessLogic;
+using Data.Entities;
+using Microsoft.EntityFrameworkCore;
+
 namespace RazorPage
 {
     public class Program
@@ -8,6 +12,16 @@ namespace RazorPage
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+
+            // Get connection string from appsettings.json
+            var connectionString = builder.Configuration.GetConnectionString("MyCnn");
+
+            // Register DbContext with DI
+            builder.Services.AddDbContext<NewsManagementDbContext>(options =>
+                options.UseSqlServer(connectionString));
+
+            // Register Application
+            builder.Services.AddApplication(builder.Configuration);
 
             var app = builder.Build();
 
