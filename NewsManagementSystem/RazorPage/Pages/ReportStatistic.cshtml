@@ -1,0 +1,25 @@
+﻿@page
+@model RazorPage.Pages.ReportStatisticModel
+@{
+    ViewData["Title"] = "News Creation Report";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>News Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.NewsCreationReports)
+        {
+            <tr>
+                <td>@item.Date.ToString("dd/MM")</td>
+                <td>@item.Count new News Created</td>
+            </tr>
+        }
+    </tbody>
+</table>
