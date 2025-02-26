@@ -14,15 +14,15 @@ namespace RazorPage.Pages
             _newsArticleService = newsArticleService;
         }
 
-        // This list will hold the grouped report data
+        // This list holds the grouped report data to be passed to the view.
         public List<NewsCreationReport> NewsCreationReports { get; set; } = new List<NewsCreationReport>();
 
         public async Task OnGetAsync()
         {
-            // Retrieve all news articles from the service
+            // Retrieve all news articles using your service
             List<GetNewsArticleDTO> newsArticles = await _newsArticleService.GetAllNewsArticle();
 
-            // Group news articles by the date they were created and count them
+            // Group by the date the news article was created (ignoring the time part)
             NewsCreationReports = newsArticles
                 .Where(n => n.CreatedDate.HasValue)
                 .GroupBy(n => n.CreatedDate.Value.Date)
@@ -36,7 +36,7 @@ namespace RazorPage.Pages
         }
     }
 
-    // A simple DTO to hold the report data
+    // DTO for report data
     public class NewsCreationReport
     {
         public DateTime Date { get; set; }
