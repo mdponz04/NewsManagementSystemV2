@@ -36,10 +36,17 @@ namespace RazorPage
             builder.Services.AddDbContext<NewsManagementDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-            builder.Services.AddApplication(builder.Configuration);
-
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddApplication(builder.Configuration);
+
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             var app = builder.Build();
 
@@ -61,6 +68,9 @@ namespace RazorPage
          //   app.MapGet("/", () => Results.Redirect("/Auth/Login"));
 
             app.UseRouting();
+            app.UseAuthentication();
+
+            app.UseSession();
 
             // Add logging middleware
             app.Use(async (context, next) =>

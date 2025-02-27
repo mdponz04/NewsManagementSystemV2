@@ -1,0 +1,59 @@
+﻿@page
+@model RazorPage.Pages.ReportStatisticModel
+@{
+    ViewData["Title"] = "News Creation Report";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<!-- Canvas for the chart -->
+<canvas id="newsChart" width="800" height="400"></canvas>
+
+    <!-- Include Chart.js from a CDN -->
+@section Scripts {
+    <!-- Include Chart.js from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Convert the server-side report data to JavaScript
+        var reports = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.NewsCreationReports));
+
+        // Extract labels (formatted dates) and counts using the correct property names.
+        var labels = reports.map(function(item) {
+            var date = new Date(item.Date);
+            // Format the date as dd/MM (e.g. "25/02")
+            var day = ("0" + date.getDate()).slice(-2);
+            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+            return day + "/" + month;
+        });
+        var counts = reports.map(function(item) {
+            return item.Count;
+        });
+
+        // Create the bar chart using Chart.js
+        var ctx = document.getElementById('newsChart').getContext('2d');
+        var newsChart = new Chart(ctx, {
+            type: 'bar', // "bar" for column chart
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'News Created',
+                    data: counts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0 // shows only integer tick values
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
+

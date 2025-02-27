@@ -14,6 +14,8 @@ namespace RazorPage.Pages
 
         public void OnGet()
         {
+            var jwtToken = HttpContext.Session.GetString("jwt_token");
+            ViewData["JwtToken"] = jwtToken;
 
         }
     }
