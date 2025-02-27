@@ -25,10 +25,10 @@
         </dd>
     </dl>
 
-    <form asp-action="Delete">
+    <form method="post">
         <input type="hidden" asp-for="CategoryId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <a asp-page="Index" class="btn btn-secondary">Back to List</a>
     </form>
 </div>
 

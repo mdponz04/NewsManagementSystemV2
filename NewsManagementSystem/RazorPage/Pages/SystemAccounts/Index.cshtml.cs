@@ -4,6 +4,7 @@ using Data.DTOs.SystemAccountDTOs;
 using Data.PaggingItem;
 using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Data.Enum;
 
 namespace RazorPage.Pages.SystemAccounts
 {
@@ -20,11 +21,16 @@ namespace RazorPage.Pages.SystemAccounts
 
         public PaginatedList<GetSystemAccountDTO> SystemAccounts { get; set; } = default!;
 
-        public async Task<IActionResult> OnGetAsync(int pageNumber = 1, int pageSize = 3)
+        // GET: Get and Search SystemAccounts
+        public async Task OnGetAsync(int pageNumber = 1, int pageSize = 3, string? searchNameString = null, string? searchEmailString = null, string? searchRoleString = null)
         {
-            SystemAccounts = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, null, null, null);
-
-            return Page();
+            EnumRole? roleFilter = null;
+            if (!string.IsNullOrEmpty(searchRoleString) && Enum.TryParse(searchRoleString, out EnumRole parsedRole))
+            {
+                roleFilter = parsedRole;
+            }
+            // Fetch paginated search categories
+            SystemAccounts = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchNameString, searchEmailString, roleFilter);
         }
     }
 }
