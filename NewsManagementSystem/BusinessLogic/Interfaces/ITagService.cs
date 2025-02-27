@@ -7,7 +7,7 @@ namespace BusinessLogic.Interfaces
     {
         Task<List<GetTagDTO>> GetAllTag();
         Task<GetTagDTO> GetTagById(int id);
-        Task<int> CreateTag(PostTagDTO tag);
+        Task CreateTag(PostTagDTO tag);
         Task UpdateTag(PutTagDTO updatedTag);
         Task DeleteTag(int id);
         Task<List<Tag>> GetListTagByIdEntityType(List<int> ids);

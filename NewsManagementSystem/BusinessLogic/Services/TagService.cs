@@ -35,13 +35,19 @@ namespace BusinessLogic.Services
             return _mapper.Map<GetTagDTO>(tag);
         }
 
-        public async Task<int> CreateTag(PostTagDTO tag)
+        public async Task CreateTag(PostTagDTO tag)
         {
             IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
             Tag newTag = _mapper.Map<Tag>(tag);
+            newTag.TagId = await AutoIncrementId();
+            //Check if tag name exists
+            if (await repository.Entities.AnyAsync(t=> t.TagName == newTag.TagName))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Tag name already exists!");
+            }
+
             await repository.InsertAsync(newTag);
             await _unitOfWork.SaveAsync();
-            return newTag.TagId;
         }
 
         public async Task UpdateTag(PutTagDTO updatedTag)
@@ -80,6 +86,16 @@ namespace BusinessLogic.Services
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "Tag not found!");
             }
+        }
+        private async Task<int> AutoIncrementId()
+        {
+            var latestTag = await _unitOfWork
+                .GetRepository<NewsTag>()
+                .Entities
+                .OrderByDescending(t => t.TagId)
+                .FirstOrDefaultAsync();
+
+            return (latestTag?.TagId ?? 0) + 1;
         }
         //NewsManagement methods
         public async Task<List<GetTagDTO>> GetAllTag()
@@ -133,13 +149,13 @@ namespace BusinessLogic.Services
                 query = query.Where(u => u.TagId == idSearch);
             }
 
-            // Search by user name
+            // Search by Tag name
             if (!string.IsNullOrWhiteSpace(nameSearch))
             {
                 query = query.Where(u => u.TagName!.Contains(nameSearch));
             }
 
-            // Search by email
+            // Search by note
             if (!string.IsNullOrWhiteSpace(noteSearch))
             {
                 query = query.Where(u => u.Note!.Equals(noteSearch));

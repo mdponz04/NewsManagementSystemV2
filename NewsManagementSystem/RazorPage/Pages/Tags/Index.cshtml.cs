@@ -1,9 +1,6 @@
-using AutoMapper;
 using BusinessLogic.Interfaces;
-using BusinessLogic.Services;
 using Data.DTOs.TagDTOs;
 using Data.PaggingItem;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RazorPage.Pages.Tags
