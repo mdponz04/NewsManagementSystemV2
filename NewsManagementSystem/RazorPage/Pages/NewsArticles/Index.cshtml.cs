@@ -1,7 +1,6 @@
 using BusinessLogic.Interfaces;
 using Data.DTOs.NewsArticleDTOs;
 using Data.PaggingItem;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RazorPage.Pages.NewsArticles
@@ -9,22 +8,9 @@ namespace RazorPage.Pages.NewsArticles
     public class IndexModel : PageModel
     {
         private readonly INewsArticleService _newsArticleService;
-        private readonly ITagService _tagService;
-        private readonly ICategoryService _categoryService;
-        private readonly INewsTagService _newsTagService;
-        private readonly IJwtTokenService _jwtTokenService;
-        public IndexModel(
-            ICategoryService categoryService
-            , ITagService tagService
-            , INewsArticleService newsArticleService
-            , INewsTagService newsTagService
-            , IJwtTokenService jwtTokenService)
+        public IndexModel(INewsArticleService newsArticleService)
         {
-            _categoryService = categoryService;
-            _tagService = tagService;
             _newsArticleService = newsArticleService;
-            _newsTagService = newsTagService;
-            _jwtTokenService = jwtTokenService;
         }
 
         public PaginatedList<GetNewsArticleDTO> NewsArticles { get; set; }

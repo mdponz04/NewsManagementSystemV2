@@ -1,12 +1,6 @@
 ﻿using Data.Entities;
 using Data.DTOs.TagDTOs;
 using Data.PaggingItem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace BusinessLogic.Interfaces
 {
     public interface ITagService

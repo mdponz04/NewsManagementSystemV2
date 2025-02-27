@@ -22,17 +22,16 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<List<GetTagDTO>> GetAllTag()
-        {
-            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
-            IEnumerable<Tag> tags = await repository.GetAllAsync();
-            return _mapper.Map<List<GetTagDTO>>(tags);
-        }
-
         public async Task<GetTagDTO> GetTagById(int id)
         {
+            
             IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            
             Tag? tag = await repository.GetByIdAsync(id);
+            if(tag == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "Tag not found!");
+            }
             return _mapper.Map<GetTagDTO>(tag);
         }
 
@@ -82,6 +81,13 @@ namespace BusinessLogic.Services
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "Tag not found!");
             }
         }
+        //NewsManagement methods
+        public async Task<List<GetTagDTO>> GetAllTag()
+        {
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            IEnumerable<Tag> tags = await repository.GetAllAsync();
+            return _mapper.Map<List<GetTagDTO>>(tags);
+        }
         public async Task<List<Tag>> GetListTagByIdEntityType(List<int> ids)
         {
             IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
@@ -101,6 +107,7 @@ namespace BusinessLogic.Services
             }
             return tags;
         }
+        //True == in use
         private async Task<bool> CheckIsTagInUseByTagId(int id)
         {
             NewsTag? newsTag = await _unitOfWork
