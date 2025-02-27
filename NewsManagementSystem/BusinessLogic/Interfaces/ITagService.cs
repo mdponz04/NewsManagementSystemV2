@@ -1,11 +1,6 @@
 ﻿using Data.Entities;
-using Data.DTOs.TagDTOs;
+using BusinessLogic.DTOs.TagDTOs;
 using Data.PaggingItem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.Interfaces
 {

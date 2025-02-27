@@ -1,4 +1,4 @@
-﻿namespace Data.DTOs.TagDTOs
+﻿namespace BusinessLogic.DTOs.TagDTOs
 {
     public class GetTagDTO : BaseTagDTO
     {

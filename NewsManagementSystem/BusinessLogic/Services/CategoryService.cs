@@ -3,7 +3,7 @@ using Data.Constants;
 using Data.Entities;
 using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
-using Data.DTOs.CategoryDTOs;
+using BusinessLogic.DTOs.CategoryDTOs;
 using Data.Interface;
 using Data.PaggingItem;
 using BusinessLogic.Interfaces;

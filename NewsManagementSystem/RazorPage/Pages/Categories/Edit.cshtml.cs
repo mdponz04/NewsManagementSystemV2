@@ -1,6 +1,6 @@
 using AutoMapper;
 using BusinessLogic.Interfaces;
-using Data.DTOs.CategoryDTOs;
+using BusinessLogic.DTOs.CategoryDTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text.Json;

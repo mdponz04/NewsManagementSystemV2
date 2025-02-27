@@ -5,7 +5,7 @@ using Data.Entities;
 using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Data.DTOs.NewsArticleDTOs;
+using BusinessLogic.DTOs.NewsArticleDTOs;
 using Data.Interface;
 using Data.PaggingItem;
 

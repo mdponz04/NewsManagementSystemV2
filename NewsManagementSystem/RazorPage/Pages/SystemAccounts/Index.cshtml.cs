@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Data.Entities;
-using Data.DTOs.SystemAccountDTOs;
+using BusinessLogic.DTOs.SystemAccountDTOs;
 using Data.PaggingItem;
 using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;

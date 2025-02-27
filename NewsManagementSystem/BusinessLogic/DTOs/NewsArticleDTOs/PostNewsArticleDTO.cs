@@ -1,4 +1,4 @@
-﻿namespace Data.DTOs.NewsArticleDTOs
+﻿namespace BusinessLogic.DTOs.NewsArticleDTOs
 {
     public class PostNewsArticleDTO : BaseNewsArticleDTO
     {

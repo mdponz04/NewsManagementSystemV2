@@ -1,4 +1,4 @@
-﻿using Data.DTOs.CategoryDTOs;
+﻿using BusinessLogic.DTOs.CategoryDTOs;
 using Data.PaggingItem;
 using System;
 using System.Collections.Generic;

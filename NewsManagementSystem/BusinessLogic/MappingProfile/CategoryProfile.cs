@@ -1,12 +1,6 @@
 ﻿using AutoMapper;
 using Data.Entities;
-using Data.DTOs.CategoryDTOs;
-using Data.DTOs.TagDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BusinessLogic.DTOs.CategoryDTOs;
 
 namespace BusinessLogic.MappingProfile
 {

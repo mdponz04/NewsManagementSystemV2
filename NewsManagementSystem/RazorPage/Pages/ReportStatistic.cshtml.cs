@@ -1,5 +1,5 @@
 using BusinessLogic.Interfaces;
-using Data.DTOs.NewsArticleDTOs;
+using BusinessLogic.DTOs.NewsArticleDTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

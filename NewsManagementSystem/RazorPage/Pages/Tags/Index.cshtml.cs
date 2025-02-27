@@ -1,7 +1,7 @@
 using AutoMapper;
 using BusinessLogic.Interfaces;
 using BusinessLogic.Services;
-using Data.DTOs.TagDTOs;
+using BusinessLogic.DTOs.TagDTOs;
 using Data.PaggingItem;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

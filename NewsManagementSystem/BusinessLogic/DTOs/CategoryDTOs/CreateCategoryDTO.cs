@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.DTOs.CategoryDTOs
+namespace BusinessLogic.DTOs.CategoryDTOs
 {
-    public class UpdateCategoryDTO : BaseCategoryDTO
+    public class CreateCategoryDTO : BaseCategoryDTO
     {
         public short CategoryID { get; set; }
 

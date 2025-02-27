@@ -5,7 +5,7 @@ using Data.Entities;
 using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Data.DTOs.TagDTOs;
+using BusinessLogic.DTOs.TagDTOs;
 using Data.Interface;
 using Data.PaggingItem;
 

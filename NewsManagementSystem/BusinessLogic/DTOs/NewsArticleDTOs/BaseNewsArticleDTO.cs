@@ -1,6 +1,6 @@
 ﻿using Data.Entities;
 
-namespace Data.DTOs.NewsArticleDTOs
+namespace BusinessLogic.DTOs.NewsArticleDTOs
 {
     public class BaseNewsArticleDTO
     {
