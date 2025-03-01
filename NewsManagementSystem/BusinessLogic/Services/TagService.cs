@@ -61,9 +61,14 @@ namespace BusinessLogic.Services
             // Update properties
             _mapper.Map(updatedTag, existingTag);
 
-            /*existingTag.TagName = updatedTag.TagName;
-            existingTag.Note = updatedTag.Note;*/
-            // Update other properties as needed
+            //Check if tag name exists
+            if (await repository
+                .Entities
+                .AnyAsync(t => t.TagName == existingTag.TagName && t.TagId != existingTag.TagId))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Tag name already exists!");
+            }
+
             repository.Update(existingTag);
             await _unitOfWork.SaveAsync();
         }

@@ -5,10 +5,10 @@
 }
 
 <h1>Index</h1>
-<form asp-action="Index" method="get" class="mb-3">
+@* <form asp-action="Index" method="get" class="mb-3">
     <input type="text" name="searchString" placeholder="Search..." class="form-control" />
     <button type="submit" class="btn btn-primary mt-2">Search</button>
-</form>
+</form> *@
 
 <p>
     <a asp-page="Create">Create New</a>
@@ -30,7 +30,7 @@
         @{
             int count = 1; // Start counting from 1
         }
-        @foreach (var item in Model.Tags.Items)
+        @foreach (var item in Model.Tags)
         {
             <tr>
                 <td>@count</td>
@@ -43,7 +43,6 @@
                 <td>
                     <a asp-page="Edit" asp-route-id="@item.TagId">Edit</a> |
                     <a asp-page="Details" asp-route-id="@item.TagId">Details</a> |
-                    <a asp-page="Delete" asp-route-id="@item.TagId">Delete</a>
                 </td>
             </tr>
             count++;
