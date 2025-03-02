@@ -128,6 +128,24 @@ namespace BusinessLogic.Services
             }
             return tags;
         }
+        public async Task<List<GetTagDTO>> GetListTag(List<int> tagIds)
+        {
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            List<Tag> tags = new List<Tag>();
+            foreach (int id in tagIds)
+            {
+                Tag? tag = await repository.GetByIdAsync(id);
+                if (tag == null)
+                {
+                    throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, $"This tag id: {id} is not found!");
+                }
+                else
+                {
+                    tags.Add(tag);
+                }
+            }
+            return _mapper.Map<List<GetTagDTO>>(tags);
+        }
         //True == in use
         private async Task<bool> CheckIsTagInUseByTagId(int id)
         {

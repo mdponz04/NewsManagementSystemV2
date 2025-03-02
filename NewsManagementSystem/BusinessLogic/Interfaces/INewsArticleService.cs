@@ -1,11 +1,5 @@
 ﻿using Data.DTOs.NewsArticleDTOs;
 using Data.PaggingItem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace BusinessLogic.Interfaces
 {
     public interface INewsArticleService
@@ -18,6 +12,7 @@ namespace BusinessLogic.Interfaces
         Task<List<GetNewsArticleDTO>> GetActiveNewsArticle();
         Task<List<GetNewsArticleDTO>> GetNewsArticleAccordingToCreateById(short createById);
         Task<List<GetNewsArticleDTO>> GetNewsArticleBySearchString(string search);
+        Task<List<int>> GetTagIdsByNewsArticleId(string newsArticleId);
         Task<PaginatedList<GetNewsArticleDTO>> GetNewsArticles(int index, int pageSize, string? idSearch, string? titleSearch, string? headlineSearch);
     }
 }

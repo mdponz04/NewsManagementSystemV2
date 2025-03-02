@@ -30,7 +30,6 @@ namespace BusinessLogic.Services
             List<NewsArticle> newsArticleList = newsArticles.ToList();
             return _mapper.Map<List<GetNewsArticleDTO>>(newsArticleList);
         }
-
         public async Task<GetNewsArticleDTO> GetNewsArticleById(string id)
         {
             IQueryable<NewsArticle> query = _unitOfWork.GetRepository<NewsArticle>().Entities;
@@ -45,12 +44,11 @@ namespace BusinessLogic.Services
             }
             newsArticle.NewsTags = newsTagList;
 
-            GetNewsArticleDTO showNewsArticle = _mapper.Map<GetNewsArticleDTO>(newsArticle);
-            showNewsArticle.CreatedByName = await GetCreatedNameByArticleId(id);
-            showNewsArticle.UpdatedByName = await GetUpdatedNameByArticleId(id);
-            return showNewsArticle;
+            GetNewsArticleDTO newsArticleGetDTO = _mapper.Map<GetNewsArticleDTO>(newsArticle);
+            newsArticleGetDTO.CreatedByName = await GetCreatedNameByArticleId(id);
+            newsArticleGetDTO.UpdatedByName = await GetUpdatedNameByArticleId(id);
+            return newsArticleGetDTO;
         }
-
         public async Task<string> CreateNewsArticle(PostNewsArticleDTO newsArticle)
         {
             ValidateNewsArticle(_mapper.Map<NewsArticle>(newsArticle));
@@ -59,11 +57,10 @@ namespace BusinessLogic.Services
             NewsArticle newNewsArticle = _mapper.Map<NewsArticle>(newsArticle);
             newNewsArticle.NewsArticleId = await GenerateNewIdAsync();
             newNewsArticle.CreatedDate = DateTime.Now;
-            newNewsArticle.ModifiedDate = DateTime.Now;
-            
+            newNewsArticle.ModifiedDate = null;
             newNewsArticle.NewsStatus = true;
-            await repository.InsertAsync(newNewsArticle);
 
+            await repository.InsertAsync(newNewsArticle);
 
             //Create news tag that is show relationship between news article and tag
             foreach (int selectedTagId in newsArticle.SelectedTags)
@@ -127,6 +124,8 @@ namespace BusinessLogic.Services
 
             // Update properties
             _mapper.Map(updatedNewsArticle, existingNewsArticle);
+            existingNewsArticle.ModifiedDate = DateTime.Now;
+            
             //Add new tags to NewsTag table
             foreach (int selectedTagId in updatedNewsArticle.SelectedTags)
             {
@@ -140,7 +139,6 @@ namespace BusinessLogic.Services
             repository.Update(existingNewsArticle);
             await _unitOfWork.SaveAsync();
         }
-        
         public async Task DeleteNewsArticle(string id)
         {
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
@@ -185,7 +183,6 @@ namespace BusinessLogic.Services
                 .ToList();
             return _mapper.Map<List<GetNewsArticleDTO>>(newsArticles);
         }
-        
         public async Task<List<GetNewsArticleDTO>> GetNewsArticleAccordingToCreateById(short createById)
         {
             // Get all news articles created by the user
@@ -255,7 +252,11 @@ namespace BusinessLogic.Services
 
             return _mapper.Map<List<GetNewsArticleDTO>>(newsArticleList);
         }
-
+        public async Task<List<int>> GetTagIdsByNewsArticleId(string newsArticleId)
+        {
+            List<NewsTag> newsTags = GetNewsArticleById(newsArticleId).Result.NewsTags;
+            return newsTags.Select(nt => nt.TagId).ToList();
+        }
         // Get list of newsarticle
         public async Task<PaginatedList<GetNewsArticleDTO>> GetNewsArticles(int index, int pageSize, string? idSearch, string? titleSearch, string? headlineSearch)
         {

@@ -13,8 +13,8 @@
 </form>
 
 <p>
-    <a asp-action="Create">Create New</a>
-    <a asp-action="CreatedNewsArticleHistory">View history of created news article</a>
+    <a asp-page="Create">Create New</a><br />
+    <a asp-page="CreatedNewsArticleHistory">View history of created news article</a>
 </p>
 <table class="table">
     <thead>
@@ -41,7 +41,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.NewsArticles.Items)
+        @foreach (var item in Model.NewsArticles)
         {
             <tr>
                 <td>
@@ -63,11 +63,7 @@
                     @Html.DisplayFor(modelItem => item.ModifyDate)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.NewsArticleId">Edit</a>
-                    <br />
-                    <a asp-action="Details" asp-route-id="@item.NewsArticleId">Details</a>
-                    <br />
-                    <a asp-action="Delete" asp-route-id="@item.NewsArticleId">Delete</a>
+                    <a asp-page="Details" asp-route-id="@item.NewsArticleId">Details</a>
                 </td>
             </tr>
         }

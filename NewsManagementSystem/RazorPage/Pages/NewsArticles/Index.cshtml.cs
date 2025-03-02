@@ -13,16 +13,17 @@ namespace RazorPage.Pages.NewsArticles
             _newsArticleService = newsArticleService;
         }
 
-        public PaginatedList<GetNewsArticleDTO> NewsArticles { get; set; }
+        public List<GetNewsArticleDTO> NewsArticles { get; set; }
 
-        public async Task OnGetAsync(int pageNumber = 1, int pageSize = 3, string? searchString = null)
+        public async Task OnGetAsync(string? searchString)
         {
             if(searchString != null)
             {
-                searchString = searchString.Trim();
+                NewsArticles = await _newsArticleService.GetNewsArticleBySearchString(searchString);
+                return;
             }
             // Fetch paginated search categories
-            NewsArticles = await _newsArticleService.GetNewsArticles(pageNumber, pageSize, null, searchString, null);
+            NewsArticles = await _newsArticleService.GetAllNewsArticle();
         }
 
     }
