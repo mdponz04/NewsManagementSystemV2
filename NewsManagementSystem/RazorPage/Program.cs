@@ -1,4 +1,5 @@
 using BusinessLogic;
+using BusinessLogic.Hubs;
 using Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using RazorPage.Middleware;
@@ -10,6 +11,8 @@ namespace RazorPage
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            // Register SignalR services
+            builder.Services.AddSignalR();
 
             builder.Services.AddSession(options =>
             {
@@ -96,6 +99,9 @@ namespace RazorPage
             app.UseAuthorization();
 
             app.MapRazorPages();
+
+            // Map the SignalR hub endpoint
+            app.MapHub<MyHub>("/myHub");
 
             app.Run();
         }

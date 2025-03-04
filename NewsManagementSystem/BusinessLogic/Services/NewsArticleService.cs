@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BusinessLogic.DTOs.NewsArticleDTOs;
 using Data.Interface;
 using Data.PaggingItem;
+using Microsoft.AspNetCore.SignalR;
+using BusinessLogic.Hubs;
 
 
 namespace BusinessLogic.Services
@@ -16,11 +18,13 @@ namespace BusinessLogic.Services
     {
         private readonly IUOW _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IHubContext<MyHub> _hubContext;
 
-        public NewsArticleService(IUOW unitOfWork, IMapper mapper)
+        public NewsArticleService(IUOW unitOfWork, IMapper mapper, IHubContext<MyHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         public async Task<List<GetNewsArticleDTO>> GetAllNewsArticle()
@@ -76,6 +80,11 @@ namespace BusinessLogic.Services
             }
             
             await _unitOfWork.SaveAsync();
+            
+            // Trigger real-time update after article creation.
+            var updatedReports = await GetNewsCreationReports();
+            await _hubContext.Clients.All.SendAsync("ReceiveNewsData", updatedReports);
+
             return newNewsArticle.NewsArticleId;
         }
         private void ValidateNewsArticle(NewsArticle newsArticle)
@@ -139,8 +148,13 @@ namespace BusinessLogic.Services
 
             repository.Update(existingNewsArticle);
             await _unitOfWork.SaveAsync();
+
+            // Trigger real-time update after article update.
+            var updatedReports = await GetNewsCreationReports();
+            await _hubContext.Clients.All.SendAsync("ReceiveNewsData", updatedReports);
+
         }
-        
+
         public async Task DeleteNewsArticle(string id)
         {
             IGenericRepository<NewsArticle> repository = _unitOfWork.GetRepository<NewsArticle>();
@@ -156,6 +170,11 @@ namespace BusinessLogic.Services
                 }
                 repository.Delete(newsArticle);
                 await _unitOfWork.SaveAsync();
+
+                // Trigger real-time update after article deletion.
+                var updatedReports = await GetNewsCreationReports();
+                await _hubContext.Clients.All.SendAsync("ReceiveNewsData", updatedReports);
+
             }
             else
             {
@@ -170,6 +189,11 @@ namespace BusinessLogic.Services
             {
                 newsArticle.NewsStatus = false;
                 await _unitOfWork.SaveAsync();
+
+                // Trigger real-time update after article inactivation.
+                var updatedReports = await GetNewsCreationReports();
+                await _hubContext.Clients.All.SendAsync("ReceiveNewsData", updatedReports);
+
             }
             else
             {
@@ -309,6 +333,25 @@ namespace BusinessLogic.Services
 
             return paginatedList;
         }
-       
+
+        public async Task<List<NewsCreationReport>> GetNewsCreationReports()
+        {
+            // Retrieve all news articles (assuming they include a CreatedDate property)
+            List<GetNewsArticleDTO> newsArticles = await GetAllNewsArticle();
+
+            // Group by the date the news article was created (ignoring the time part)
+            List<NewsCreationReport> reports = newsArticles
+                .Where(n => n.CreatedDate.HasValue)
+                .GroupBy(n => n.CreatedDate.Value.Date)
+                .Select(g => new NewsCreationReport
+                {
+                    Date = g.Key,
+                    Count = g.Count()
+                })
+                .OrderBy(report => report.Date)
+                .ToList();
+            return reports;
+        }
+
     }
 }

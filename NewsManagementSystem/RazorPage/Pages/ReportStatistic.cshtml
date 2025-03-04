@@ -9,30 +9,31 @@
 <!-- Canvas for the chart -->
 <canvas id="newsChart" width="800" height="400"></canvas>
 
-    <!-- Include Chart.js from a CDN -->
 @section Scripts {
     <!-- Include Chart.js from a CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include SignalR client library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+
     <script>
         // Convert the server-side report data to JavaScript
         var reports = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.NewsCreationReports));
 
         // Extract labels (formatted dates) and counts using the correct property names.
-        var labels = reports.map(function(item) {
+        var labels = reports.map(function (item) {
             var date = new Date(item.Date);
-            // Format the date as dd/MM (e.g. "25/02")
             var day = ("0" + date.getDate()).slice(-2);
             var month = ("0" + (date.getMonth() + 1)).slice(-2);
             return day + "/" + month;
         });
-        var counts = reports.map(function(item) {
+        var counts = reports.map(function (item) {
             return item.Count;
         });
 
-        // Create the bar chart using Chart.js
+        // Create the Chart.js bar chart
         var ctx = document.getElementById('newsChart').getContext('2d');
         var newsChart = new Chart(ctx, {
-            type: 'bar', // "bar" for column chart
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
@@ -48,12 +49,40 @@
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            precision: 0 // shows only integer tick values
+                            precision: 0
                         }
                     }
                 }
             }
         });
+
+        // Set up the SignalR connection
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/myHub")
+            .build();
+
+        // Listen for updates from the hub
+        connection.on("ReceiveNewsData", function (updatedReports) {
+            // Assuming updatedReports is an array with the same structure as 'reports'
+            var labels = updatedReports.map(function (item) {
+                var date = new Date(item.Date);
+                var day = ("0" + date.getDate()).slice(-2);
+                var month = ("0" + (date.getMonth() + 1)).slice(-2);
+                return day + "/" + month;
+            });
+            var counts = updatedReports.map(function (item) {
+                return item.Count;
+            });
+
+            // Update chart data and refresh the chart
+            newsChart.data.labels = labels;
+            newsChart.data.datasets[0].data = counts;
+            newsChart.update();
+        });
+
+        // Start the SignalR connection.
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
     </script>
 }
-
