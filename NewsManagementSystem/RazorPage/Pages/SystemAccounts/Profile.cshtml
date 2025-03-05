@@ -4,6 +4,9 @@
 
 @{
     ViewData["Title"] = "Profile";
+    var jwtToken = HttpContext.Session.GetString("jwt_token");
+    var userRole = ViewData["currrentLoggedInUserRole"] as string;
+    string adminRole = "0";
 }
 
 <h1>Profile</h1>
@@ -35,15 +38,14 @@
 
 <button type="button" class="btn btn-warning" onclick="loadEditForm(@Model.SystemAccount.AccountId)">Edit</button>
 
-@* Conditional back button based on user role *@
-@* @if (Model.UserRole!.Equals("0")) // Assuming "0" is admin role *@
-@* { *@
-@*     <a asp-page="./Index" class="btn btn-secondary">Back</a> *@
-@* } *@
-@* else *@
-@* { *@
-@*     <a asp-page="/Index" class="btn btn-secondary">Back</a> *@
-@* } *@
+@if (userRole!.Equals(adminRole))
+{
+    <a asp-page="./Index" class="btn btn-secondary">Back</a>
+}
+else
+{
+    <a asp-page="/Index" class="btn btn-secondary">Back</a>
+}
 
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -58,14 +60,8 @@
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(ViewData["SuccessMessage"] as string))
-{
-    <div class="alert alert-success">
-        @ViewData["SuccessMessage"]
-    </div>
-}
-
 @section Scripts {
+
     <script>
         function loadEditForm(id) {
             $.get('/SystemAccounts/Edit/' + id) // Corrected URL

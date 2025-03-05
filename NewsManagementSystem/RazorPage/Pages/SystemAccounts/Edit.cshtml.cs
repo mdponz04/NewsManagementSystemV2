@@ -10,11 +10,14 @@ namespace RazorPage.Pages.SystemAccounts
     {
         private readonly ISystemAccountService _systemAccountService;
         private readonly IMapper _mapper;
+        private readonly IJwtTokenService _jwtTokenService;
+        private const string ADMIN_Role = "0";
 
-        public EditModel(ISystemAccountService systemAccountService, IMapper mapper)
+        public EditModel(ISystemAccountService systemAccountService, IMapper mapper, IJwtTokenService jwtTokenService)
         {
             _systemAccountService = systemAccountService;
             _mapper = mapper;
+            _jwtTokenService = jwtTokenService;
         }
 
         [BindProperty]
@@ -22,6 +25,20 @@ namespace RazorPage.Pages.SystemAccounts
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
+            var jwtToken = HttpContext.Session.GetString("jwt_token");
+            string userRole = _jwtTokenService.GetRole(jwtToken!);
+            string curentLoggedInUserId = _jwtTokenService.GetId(jwtToken!);
+
+            if (userRole == null)
+            {
+                return Unauthorized();
+            }
+
+            if (curentLoggedInUserId != id.ToString() && userRole != ADMIN_Role)
+            {
+                return Forbid();
+            }
+
             short formattedId = (short)id;
 
             var getAccountDto = await _systemAccountService.GetUserAccountById(formattedId);
