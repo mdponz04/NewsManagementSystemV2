@@ -1,38 +1,11 @@
-﻿@page "/SystemAccounts/Edit"
+﻿@page "/SystemAccounts/Edit/{id:int}" // Route parameter
 @model RazorPage.Pages.SystemAccounts.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Account";
+    Layout = null; // Important for partial view in modal
 }
 
-<form method="post" id="editAccountForm">
-    <input type="hidden" asp-for="SystemAccount.AccountId" />
-
-    <div class="form-group">
-        <label asp-for="SystemAccount.AccountName">Name</label>
-        <input asp-for="SystemAccount.AccountName" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="SystemAccount.AccountEmail">Email</label>
-        <input asp-for="SystemAccount.AccountEmail" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-warning">Update</button>
-    <a class="btn btn-secondary" asp-page="./Index">Back to List</a>
-</form>
-
-<script>
-    $('#editAccountForm').submit(function (event) {
-        event.preventDefault();
-        $.post('/SystemAccounts/Edit', $(this).serialize(), function () {
-            $('#editModal').modal('hide');
-            location.reload(); // Reload to update table
-        });
-    });
-</script>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+<div id="editFormContainer">
+    @await Html.PartialAsync("_EditSystemAccountPartial", Model.SystemAccountDto)
+</div>

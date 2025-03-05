@@ -47,7 +47,13 @@ namespace RazorPage.Pages.SystemAccounts
         {
             SystemAccount = await _systemAccountService.GetUserAccountById(id);
 
+            if (TempData["EditSuccess"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["EditSuccess"];
+            }
+
             return Page();
+
         }
     }
 }
