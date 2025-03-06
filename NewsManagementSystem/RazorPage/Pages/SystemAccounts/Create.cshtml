@@ -3,49 +3,86 @@
 @model RazorPage.Pages.SystemAccounts.CreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create System Account";
 }
 
-<form method="post" id="createAccountForm">
-    <div class="form-group">
-        <label asp-for="SystemAccount.AccountName">Name</label>
-        <input asp-for="SystemAccount.AccountName" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="SystemAccount.AccountEmail">Email</label>
-        <input asp-for="SystemAccount.AccountEmail" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="SystemAccount.Role">Role</label>
-        <select asp-for="SystemAccount.Role" asp-items="Html.GetEnumSelectList<EnumRole>()" class="form-control"></select>
-    </div>
-    <div class="form-group">
-        <label asp-for="SystemAccount.AccountPassword">Password</label>
-        <input asp-for="SystemAccount.AccountPassword" type="password" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="SystemAccount.ConfirmedPassword">Confirm Password</label>
-        <input asp-for="SystemAccount.ConfirmedPassword" type="password" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-success">Create</button>
-</form>
+<div class="container mt-4">
+    <div class="card privacy-section">
+        <div class="card-header bg-success text-white">
+            <h2 class="mb-0">Create New Account</h2>
+        </div>
+        <div class="card-body content">
+            <form method="post" id="createAccountForm">
+                <div class="form-group mb-3">
+                    <label asp-for="SystemAccount.AccountName" class="form-label fw-bold"></label>
+                    <input asp-for="SystemAccount.AccountName" class="form-control" placeholder="Enter account name" />
+                    <span asp-validation-for="SystemAccount.AccountName" class="text-danger"></span>
+                </div>
 
-<script>
-    $('#createAccountForm').submit(function (event) {
-        event.preventDefault();
-        $.post('/SystemAccounts/Create', $(this).serialize(), function () {
-            $('#createModal').modal('hide');
-            location.reload(); // Reload to update table
-        });
-    });
-</script>
+                <div class="form-group mb-3">
+                    <label asp-for="SystemAccount.AccountEmail" class="form-label fw-bold"></label>
+                    <input asp-for="SystemAccount.AccountEmail" class="form-control" placeholder="Enter email address" />
+                    <span asp-validation-for="SystemAccount.AccountEmail" class="text-danger"></span>
+                </div>
 
-<div>
-    <a class="btn btn-secondary" asp-page="./Index">Back to List</a>
+                <div class="form-group mb-3">
+                    <label asp-for="SystemAccount.Role" class="form-label fw-bold"></label>
+                    <select asp-for="SystemAccount.Role" asp-items="Html.GetEnumSelectList<EnumRole>()" class="form-control">
+                        <option value="">Select a role</option>
+                    </select>
+                    <span asp-validation-for="SystemAccount.Role" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="SystemAccount.AccountPassword" class="form-label fw-bold"></label>
+                    <input asp-for="SystemAccount.AccountPassword" type="password" class="form-control" placeholder="Enter password" />
+                    <span asp-validation-for="SystemAccount.AccountPassword" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="SystemAccount.ConfirmedPassword" class="form-label fw-bold"></label>
+                    <input asp-for="SystemAccount.ConfirmedPassword" type="password" class="form-control" placeholder="Confirm password" />
+                    <span asp-validation-for="SystemAccount.ConfirmedPassword" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success fw-bold px-4">Create</button>
+                    <a class="btn btn-secondary fw-bold px-4" asp-page="./Index">Back to List</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('#createAccountForm').on('submit', function (event) {
+                event.preventDefault();
+
+                // Check if the form is valid
+                if ($(this).valid()) {
+                    $.ajax({
+                        url: '/SystemAccounts/Create',
+                        method: 'POST',
+                        data: $(this).serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                // If modal is used
+                                $('#createModal').modal('hide');
+                                // Redirect to Index page
+                                window.location.href = '/SystemAccounts/Index';
+                            } else {
+                                alert('Creation failed: ' + (response.message || 'Unknown error'));
+                            }
+                        },
+                        error: function () {
+                            alert('An error occurred while creating the account.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 }

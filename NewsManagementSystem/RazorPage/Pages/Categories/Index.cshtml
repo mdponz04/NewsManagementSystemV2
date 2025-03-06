@@ -2,71 +2,123 @@
 @model RazorPage.Pages.Categories.IndexModel
 
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = "Category Management";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Categories</h1>
+<div class="container-fluid px-4 py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg border-0 rounded-4 animate-card">
+                <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center p-4">
+                    <h2 class="h3 mb-0 fw-bold text-gradient">
+                        <i class="fas fa-stream me-3"></i>Category Management
+                    </h2>
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-light animate-btn shadow-sm"
+                                onclick="loadCreateForm()" data-bs-toggle="modal" data-bs-target="#createModal">
+                            <i class="fas fa-plus-circle me-2"></i>Add New Category
+                        </button>
+                    </div>
+                </div>
 
-    <form asp-action="Search" method="get" class="mb-4">
-        <div class="input-group">
-            <label for="searchString" class="input-group-text">Search:</label>
-            <input type="text" id="searchString" name="searchString" placeholder="Enter search..." class="form-control" />
-            <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
-            <button type="submit" class="btn btn-primary">Search</button>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-6 col-lg-4">
+                            <form asp-action="Search" method="get" class="d-flex">
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text bg-white border-0"><i class="fas fa-search text-primary"></i></span>
+                                    <input type="text" id="searchString" name="searchString"
+                                           placeholder="Search categories..."
+                                           class="form-control border-0" />
+                                    <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
+                                    <button type="submit" class="btn btn-primary animate-btn">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped align-middle">
+                            <thead class="bg-light text-muted">
+                                <tr>
+                                    <th class="text-center fw-semibold">Category Name</th>
+                                    <th class="text-center fw-semibold">Description</th>
+                                    <th class="text-center fw-semibold">Status</th>
+                                    <th class="text-center fw-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Categories.Items)
+                                {
+                                    <tr class="animate-row">
+                                        <td class="text-center fw-medium">@item.CategoryName</td>
+                                        <td class="text-center text-truncate" style="max-width: 300px;">@item.CategoryDescription</td>
+                                        <td class="text-center">
+                                            <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary") rounded-pill px-3 py-2">
+                                                @(item.IsActive ? "Active" : "Inactive")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-outline-warning animate-btn"
+                                                        onclick="loadEditForm(@item.CategoryId)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger animate-btn"
+                                                        onclick="confirmDelete(@item.CategoryId)">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div>
+                            @if (Model.Categories.HasPreviousPage)
+                            {
+                                <a asp-page="/Categories/Index"
+                                   asp-route-pageNumber="@(Model.Categories.PageNumber - 1)"
+                                   class="btn btn-outline-primary animate-btn shadow-sm">
+                                    <i class="fas fa-chevron-left me-2"></i>Previous
+                                </a>
+                            }
+                        </div>
+
+                        <span class="text-muted fw-medium">
+                            Page @Model.Categories.PageNumber of @Model.Categories.TotalPages
+                        </span>
+
+                        <div>
+                            @if (Model.Categories.HasNextPage)
+                            {
+                                <a asp-page="/Categories/Index"
+                                   asp-route-pageNumber="@(Model.Categories.PageNumber + 1)"
+                                   class="btn btn-outline-primary animate-btn shadow-sm">
+                                    Next<i class="fas fa-chevron-right ms-2"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
-
-    <button type="button" class="btn btn-success mb-3" onclick="loadCreateForm()">Create Category</button>
-
-    <table class="table table-striped table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>Category Name</th>
-                <th>Category Description</th>
-                <th>Active</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Categories.Items)
-            {
-                <tr>
-                    <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
-                    <td>@Html.DisplayFor(modelItem => item.CategoryDescription)</td>
-                    <td>@Html.DisplayFor(modelItem => item.IsActive)</td>
-                    <td>
-                        <a class="btn btn-warning btn-sm" href="javascript:void(0)" onclick="loadEditForm(@item.CategoryId)">Edit</a>
-                        <a class="btn btn-danger btn-sm" asp-page="./Delete" asp-route-id="@item.CategoryId">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <div>
-        @if (Model.Categories.HasPreviousPage)
-        {
-            <a asp-page="/Categories/Index" asp-route-pageNumber="@(Model.Categories.PageNumber - 1)" class="btn btn-primary">Previous</a>
-        }
-
-        <span>Page @Model.Categories.PageNumber of @Model.Categories.TotalPages</span>
-
-        @if (Model.Categories.HasNextPage)
-        {
-            <a asp-page="/Categories/Index" asp-route-pageNumber="@(Model.Categories.PageNumber + 1)" class="btn btn-primary">Next</a>
-        }
     </div>
 
     <!-- Create Modal -->
     <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Create Category</h5>
-                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header bg-gradient-primary text-white">
+                    <h5 class="modal-title fw-bold">Create Category</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="createFormContainer">
+                <div class="modal-body p-4" id="createFormContainer">
                     <!-- Create form will be loaded here -->
                 </div>
             </div>
@@ -74,78 +126,320 @@
     </div>
 
     <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Category</h5>
-                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header bg-gradient-primary text-white">
+                    <h5 class="modal-title fw-bold">Edit Category</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="editFormContainer">
-                    <!-- Edit form will be loaded here -->
+                <div class="modal-body p-4" id="editFormContainer">
+                    <!-- Dynamic form will be loaded here -->
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="modal fade show" id="successModal" tabindex="-1" aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-success">Success</h5>
-                        <button type="button" class="btn-close" onclick="closeSuccessModal()"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>@TempData["Success Message"]</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="closeSuccessModal()">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <script>
-            function closeSuccessModal() {
-                document.getElementById("successModal").style.display = "none";
-            }
-
-            // Auto-hide success modal after 3 seconds
-            setTimeout(closeSuccessModal, 3000);
-        </script>
+<style>
+    :root {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --light-bg: #f8f9fa;
+        --text-color: #343a40;
+        --shadow-color: rgba(0, 0, 0, 0.15);
     }
 
+    body {
+        font-family: 'Poppins', 'Segoe UI', sans-serif;
+        background-color: var(--light-bg);
+        color: var(--text-color);
+    }
+
+    /* Gradient Styling */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary-color), #1e90ff);
+    }
+
+    .text-gradient {
+        background: linear-gradient(90deg, black, grey);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Card Styling */
+    .card {
+        border-radius: 20px;
+        overflow: hidden;
+        background: #fff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .animate-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px var(--shadow-color);
+    }
+
+    /* Button Styling */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #1e90ff);
+        border: none;
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0056b3, #187bcd);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px var(--shadow-color);
+    }
+
+    .btn-light {
+        background: #fff;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-light:hover {
+        background: var(--primary-color);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px var(--shadow-color);
+    }
+
+    .btn-outline-primary {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px var(--shadow-color);
+    }
+
+    .btn-outline-warning {
+        border-color: var(--warning-color);
+        color: var(--warning-color);
+        border-radius: 50%;
+        padding: 0.4rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-warning:hover {
+        background-color: rgba(255, 193, 7, 0.1);
+        transform: scale(1.1);
+    }
+
+    .btn-outline-danger {
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+        border-radius: 50%;
+        padding: 0.4rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+        transform: scale(1.1);
+    }
+
+    /* Table Styling */
+    .table {
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 4px 15px var(--shadow-color);
+    }
+
+    .table th {
+        background: #f1f3f5;
+        padding: 1.25rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .animate-row {
+        transition: all 0.3s ease;
+    }
+
+    .animate-row:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.2rem;
+        font-weight: 500;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .badge:hover {
+        transform: scale(1.05);
+    }
+
+    /* Input Group */
+    .input-group {
+        border-radius: 50px;
+        overflow: hidden;
+        background: #fff;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .input-group:hover {
+        box-shadow: 0 4px 12px var(--shadow-color);
+    }
+
+    .input-group-text {
+        background: #fff;
+        border: none;
+        color: var(--primary-color);
+    }
+
+    .form-control {
+        border: none;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        color: var(--text-color);
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        color: var(--text-color);
+    }
+
+    /* Modal Styling */
+    .modal-content {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px var(--shadow-color);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    /* Animation */
+    keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
     <script>
         function loadCreateForm() {
-            $.get('/Categories/Create', function (data) {
-                $('#createFormContainer').html(data);
-                $('#createModal').modal('show');
+            $.ajax({
+                url: '/Categories/Create',
+                method: 'GET',
+                success: function (data) {
+                    $('#createFormContainer').html(data);
+                    $('#createModal').modal('show');
+                },
+                error: function () {
+                    toastr.error('Could not load create form');
+                }
             });
         }
 
         function loadEditForm(id) {
-            $.get('/Categories/Edit?id=' + id, function (data) {
-                $('#editFormContainer').html(data);
-                $('#editModal').modal('show');
+            $.ajax({
+                url: '/Categories/Edit',
+                method: 'GET',
+                data: { id: id },
+                success: function (data) {
+                    $('#editFormContainer').html(data);
+                    $('#editModal').modal('show');
+                },
+                error: function () {
+                    toastr.error('Could not load edit form');
+                }
+            });
+        }
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this category!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/Categories/Delete?id=${id}`;
+                }
             });
         }
 
         $(document).on("submit", "#createAccountForm", function (event) {
             event.preventDefault();
-            $.post('/Categories/Create', $(this).serialize(), function () {
-                $('#createModal').modal('hide');
-                location.reload();
+            $.ajax({
+                url: '/Categories/Create',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function () {
+                    $('#createModal').modal('hide');
+                    toastr.success('Category created successfully');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function () {
+                    toastr.error('Error creating category');
+                }
             });
         });
 
         $(document).on("submit", "#editAccountForm", function (event) {
             event.preventDefault();
-            $.post('/Categories/Edit', $(this).serialize(), function () {
-                $('#editModal').modal('hide');
-                location.reload();
+            $.ajax({
+                url: '/Categories/Edit',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function () {
+                    $('#editModal').modal('hide');
+                    toastr.success('Category updated successfully');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function () {
+                    toastr.error('Error updating category');
+                }
             });
         });
     </script>
-</div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+}

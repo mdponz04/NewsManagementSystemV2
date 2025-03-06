@@ -18,7 +18,7 @@
         // Convert the server-side report data to JavaScript
         var reports = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.NewsCreationReports));
 
-        // Extract labels (formatted dates) and counts using the correct property names.
+        // Extract labels (formatted dates) and counts using the correct property names
         var labels = reports.map(function (item) {
             var date = new Date(item.Date);
             // Format the date as dd/MM (e.g. "25/02")
@@ -30,37 +30,41 @@
             return item.Count;
         });
 
-        // Create the doughnut chart using Chart.js
+        // Create the bar chart using Chart.js
         var ctx = document.getElementById('newsChart').getContext('2d');
         var newsChart = new Chart(ctx, {
-            type: 'doughnut', // Change to 'doughnut' for a donut chart
+            type: 'bar', // Changed to bar chart
             data: {
                 labels: labels,
                 datasets: [{
                     label: 'News Created',
                     data: counts,
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.6)',
-                        'rgba(255, 99, 132, 0.6)',
-                        'rgba(75, 192, 192, 0.6)',
-                        'rgba(255, 206, 86, 0.6)',
-                        'rgba(153, 102, 255, 0.6)',
-                        'rgba(255, 159, 64, 0.6)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // Blue color for bars
+                    borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false, // Allow custom height and width
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date (dd/MM)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Articles'
+                        },
+                        ticks: {
+                            stepSize: 1 // Ensure integer steps
+                        }
+                    }
+                },
                 plugins: {
                     legend: {
                         position: 'top',
@@ -68,7 +72,7 @@
                     tooltip: {
                         callbacks: {
                             label: function (tooltipItem) {
-                                return tooltipItem.label + ': ' + tooltipItem.raw; // Show count in tooltip
+                                return tooltipItem.label + ': ' + tooltipItem.raw + ' articles';
                             }
                         }
                     }

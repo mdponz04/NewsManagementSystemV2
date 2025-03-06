@@ -4,11 +4,102 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="container text-center mt-5">
-    <h1 class="display-4">Welcome</h1>
-    <p class="lead">Learn about <a href="https://learn.microsoft.com/aspnet/core" class="text-primary">building Web apps with ASP.NET Core</a>.</p>
-    <hr class="my-4">
-    <p class="text-muted">Explore the documentation to get started with building modern web applications.</p>
+<style>
+    .hero-section {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        padding: 0 15px;
+        color: white;
+        position: relative;
+        z-index: 2;
+    }
+
+    .bg-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.2;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><circle fill="#fff" cx="400" cy="400" r="300" opacity="0.1"/><circle fill="#fff" cx="200" cy="200" r="100" opacity="0.15"/><circle fill="#fff" cx="600" cy="600" r="150" opacity="0.1"/></svg>');
+        animation: float 15s infinite;
+    }
+
+    keyframes float {
+        0% { transform: translate(0, 0); }
+        50% { transform: translate(20px, 20px); }
+        100% { transform: translate(0, 0); }
+    }
+
+    .title-glow {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    keyframes pulse {
+        0% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+        50% { text-shadow: 0 0 30px rgba(255, 255, 255, 0.5); }
+        100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+    }
+
+    .btn-explore {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid white;
+        border-radius: 30px;
+        padding: 12px 30px;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-explore:hover {
+        background: white;
+        color: #1e3c72;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.4);
+    }
+
+    .lead-text {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px 25px;
+        border-radius: 15px;
+        backdrop-filter: blur(5px);
+    }
+</style>
+
+<div class="hero-section">
+    <div class="bg-particles"></div>
+    <div class="container hero-content d-flex flex-column justify-content-center align-items-center h-100 text-center">
+        <h1 class="display-3 fw-bold title-glow mb-4">
+            <i class="bi bi-rocket-takeoff-fill me-2"></i>Welcome to Your Journey
+        </h1>
+        
+        <p class="lead lead-text mb-4 mx-auto" style="max-width: 600px;">
+            Discover the power of 
+            <a href="https://learn.microsoft.com/aspnet/core" 
+               class="text-white fw-bold text-decoration-underline">
+                ASP.NET Core
+            </a> 
+            for building modern, scalable web applications.
+        </p>
+
+        <div class="mt-4">
+            <a href="https://learn.microsoft.com/aspnet/core" 
+               class="btn btn-explore">
+                <i class="bi bi-book me-2"></i>Explore Documentation
+            </a>
+        </div>
+
+        <div class="mt-5">
+            <p class="text-white-50" style="font-size: 0.9em;">
+                Start building tomorrow's web today
+            </p>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -17,3 +108,7 @@
         console.log("JWT Token: " + jwtToken);
     }
 </script>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+}

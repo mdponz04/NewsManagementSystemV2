@@ -42,7 +42,7 @@ namespace NewsManagementSystem.Controllers
         // GET: Create Category
         public IActionResult Create()
         {
-            return View();
+            return PartialView();
         }
 
         [HttpPost]

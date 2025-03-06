@@ -5,6 +5,8 @@ namespace Data.PaggingItem
     public class PaginatedList<T>
     {
         public IReadOnlyCollection<T> Items { get; }
+
+        public int PageIndex { get; set; }
         public int PageNumber { get; }
         public int TotalPages { get; }
         public int TotalCount { get; }
