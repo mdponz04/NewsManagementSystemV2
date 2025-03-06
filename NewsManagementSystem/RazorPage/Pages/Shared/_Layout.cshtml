@@ -64,9 +64,15 @@
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Tags/Index">Tag</a>
                             </li>
                         }
-                        <li class ="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/ReportStatistic">Report Statistic</a>
-                        </li>
+                        @if (jwtToken != null)
+                        {
+                            @if (User.IsInRole(adminRole))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/ReportStatistic">Report Statistic</a>
+                                </li>
+                            }
+                        }
                         <li class="nav-item">
                             @if (jwtToken == null)
                             {
