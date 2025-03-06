@@ -1,0 +1,176 @@
+﻿@page
+@model RazorPage.Pages.Categories.IndexModel
+
+
+@{
+    ViewData["Title"] = "Index";
+    var jwtToken = ViewData["JwtToken"] as string;
+    var userRole = ViewData["UserRole"] as string;
+    string adminRole = "0";
+}
+
+
+
+
+<form asp-action="Search" method="get" class="mb-5">
+    <label for="nameSearch">Search:</label>
+    <input type="text" id="searchString" name="searchString" placeholder="Enter search...">
+    <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
+    <button type="submit">Search</button>
+</form>
+
+<button type="button" class="btn btn-primary" onclick="loadCreateForm()">Create Category</button>
+
+<h1>Category</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Category Name
+            </th>
+            <th>
+                Category Description
+            </th>
+            <th>
+                Active
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Categories.Items)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryDescription)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(jwtToken))
+                    {
+                        if (userRole.Trim() == adminRole.Trim() || userRole.Trim() == "1")
+                            {
+                            <a class="btn btn-primary" href="javascript:void(0)" onclick="loadEditForm(@item.CategoryId)">Edit</a>
+                            <a class="btn btn-danger" asp-page="./Delete" asp-route-id="@item.CategoryId">Delete</a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    @if (Model.Categories.HasPreviousPage)
+    {
+        <a asp-page="/Categories/Index" asp-route-pageNumber="@(Model.Categories.PageNumber - 1)" class="btn btn-primary">Previous</a>
+    }
+
+    <span>Page @Model.Categories.PageNumber of @Model.Categories.TotalPages</span>
+
+    @if (Model.Categories.HasNextPage)
+    {
+        <a asp-page="/Categories/Index" asp-route-pageNumber="@(Model.Categories.PageNumber + 1)" class="btn btn-primary">Next</a>
+    }
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="createFormContainer">
+                <!-- Create form will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="editFormContainer">
+                <!-- Edit form will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="modal fade show" id="successModal" tabindex="-1" aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-success">Success</h5>
+                    <button type="button" class="btn-close" onclick="closeSuccessModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@TempData["SuccessMessage"]</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeSuccessModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function closeSuccessModal() {
+            document.getElementById("successModal").style.display = "none";
+        }
+
+        // Auto-hide success modal after 3 seconds
+        setTimeout(closeSuccessModal, 3000);
+    </script>
+}
+
+
+<script>
+    function loadCreateForm() {
+        $.get('/Categories/Create', function (data) {
+            $('#createFormContainer').html(data);
+            $('#createModal').modal('show');
+        });
+    }
+
+function loadEditForm(id) {
+    $.get('/Categories/Edit?id=' + id, function (data) {
+        $('#editFormContainer').html(data);
+        $('#editModal').modal('show');
+    });
+}
+
+    $(document).on("submit", "#createAccountForm", function (event) {
+        event.preventDefault();
+        $.post('/Categories/Create', $(this).serialize(), function () {
+            $('#createModal').modal('hide');
+            location.reload();
+        });
+    });
+
+    $(document).on("submit", "#editAccountForm", function (event) {
+        event.preventDefault();
+        $.post('/Categories/Edit', $(this).serialize(), function () {
+            $('#editModal').modal('hide');
+            location.reload();
+        });
+    });
+</script>

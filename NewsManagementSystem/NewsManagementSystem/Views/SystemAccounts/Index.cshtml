@@ -1,4 +1,4 @@
-﻿@model Data.PaggingItem.PaginatedList<Data.DTOs.SystemAccountDTOs.GetSystemAccountDTO>
+﻿@model Data.PaggingItem.PaginatedList<BusinessLogic.DTOs.SystemAccountDTOs.GetSystemAccountDTO>
 
 
 @{
@@ -57,7 +57,7 @@
                     </td>
                     <td>
                     <button class="btn btn-warning" onclick="loadEditForm(@item.AccountId, this)">Edit</button> |
-                        <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.AccountId">Profile</a> |
+                    <a class="btn btn-info" asp-action="Profile" asp-route-id="@item.AccountId">Profile</a> |
                         <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.AccountId">Delete</a>
                     </td>
                 </tr>

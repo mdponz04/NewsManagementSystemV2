@@ -1,0 +1,11 @@
+﻿@page "/SystemAccounts/Edit/{id:int}" // Route parameter
+@model RazorPage.Pages.SystemAccounts.EditModel
+
+@{
+    ViewData["Title"] = "Edit Account";
+    Layout = null; // Important for partial view in modal
+}
+
+<div id="editFormContainer">
+    @await Html.PartialAsync("_EditSystemAccountPartial", Model.SystemAccountDto)
+</div>

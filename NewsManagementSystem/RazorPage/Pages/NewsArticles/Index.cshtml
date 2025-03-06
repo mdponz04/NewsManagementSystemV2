@@ -1,0 +1,76 @@
+﻿@page
+@model RazorPage.Pages.NewsArticles.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<h1>Index</h1>
+<form asp-action="Index" method="get" class="mb-3">
+    <input type="text" name="searchString" placeholder="Search..." class="form-control" />
+    <button type="submit" class="btn btn-primary mt-2">Search</button>
+</form>
+
+<p>
+    
+    @if (User.IsInRole("1"))
+    {
+        <a asp-page="Create">Create New</a>
+        <br />
+        <a asp-page="NewsArticleCreateHistory">View history of created news article</a>
+    }
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                News title
+            </th>
+            <th>
+                Headline
+            </th>
+            <th>
+                News content
+            </th>
+            <th>
+                News source
+            </th>
+            <th>
+                Created date
+            </th>
+            <th>
+                Modified date
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.NewsArticles)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Headline)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsContent)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewsSource)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModifyDate)
+                </td>
+                <td>
+                    <a asp-page="Details" asp-route-id="@item.NewsArticleId">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Data.Entities;
-using Data.DTOs.SystemAccountDTOs;
+using BusinessLogic.DTOs.SystemAccountDTOs;
 
 namespace BusinessLogic.MappingProfile
 {
@@ -11,6 +11,7 @@ namespace BusinessLogic.MappingProfile
             CreateMap<SystemAccount, GetSystemAccountDTO>().ReverseMap();
             CreateMap<SystemAccount, PostSystemAccountDTO>().ReverseMap();
             CreateMap<SystemAccount, PutSystemAccountDTO>().ReverseMap();
+            CreateMap<GetSystemAccountDTO, PutSystemAccountDTO>().ReverseMap();
         }
     }
 }
