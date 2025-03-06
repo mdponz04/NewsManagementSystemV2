@@ -4,7 +4,12 @@
 
 @{
     ViewData["Title"] = "Index";
+    var jwtToken = ViewData["JwtToken"] as string;
+    var userRole = ViewData["UserRole"] as string;
+    string adminRole = "0";
 }
+
+
 
 
 <form asp-action="Search" method="get" class="mb-5">
@@ -46,8 +51,14 @@
                     @Html.DisplayFor(modelItem => item.IsActive)
                 </td>
                 <td>
-                    <a class="btn btn-primary" href="javascript:void(0)" onclick="loadEditForm(@item.CategoryId)">Edit</a>
-                    <a class="btn btn-danger" asp-page="./Delete" asp-route-id="@item.CategoryId">Delete</a>
+                    @if (!string.IsNullOrEmpty(jwtToken))
+                    {
+                        if (userRole.Trim() == adminRole.Trim() || userRole.Trim() == "1")
+                            {
+                            <a class="btn btn-primary" href="javascript:void(0)" onclick="loadEditForm(@item.CategoryId)">Edit</a>
+                            <a class="btn btn-danger" asp-page="./Delete" asp-route-id="@item.CategoryId">Delete</a>
+                        }
+                    }
                 </td>
             </tr>
         }
