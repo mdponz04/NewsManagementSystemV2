@@ -1,5 +1,5 @@
 ﻿using Data.Entities;
-using Data.DTOs.TagDTOs;
+using BusinessLogic.DTOs.TagDTOs;
 using Data.PaggingItem;
 namespace BusinessLogic.Interfaces
 {

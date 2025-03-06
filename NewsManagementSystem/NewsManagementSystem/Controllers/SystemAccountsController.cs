@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Data.DTOs.SystemAccountDTOs;
+using BusinessLogic.DTOs.SystemAccountDTOs;
 using Data.PaggingItem;
 using BusinessLogic.Interfaces;
 using Data.Enum;

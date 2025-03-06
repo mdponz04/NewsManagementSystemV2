@@ -1,4 +1,4 @@
-﻿namespace Data.DTOs.SystemAccountDTOs
+﻿namespace BusinessLogic.DTOs.SystemAccountDTOs
 {
     public class GetSystemAccountDTO : BaseSystemAccountDTO
     {

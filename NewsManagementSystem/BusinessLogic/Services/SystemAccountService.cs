@@ -7,7 +7,7 @@ using Data.ExceptionCustom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Data.DTOs.SystemAccountDTOs;
+using BusinessLogic.DTOs.SystemAccountDTOs;
 using Data.Interface;
 using Data.PaggingItem;
 

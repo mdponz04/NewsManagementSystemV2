@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using Data.Entities;
-using Data.DTOs.NewsArticleDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BusinessLogic.DTOs.NewsArticleDTOs;
 
 namespace BusinessLogic.MappingProfile
 {

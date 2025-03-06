@@ -1,5 +1,5 @@
 ﻿using Data.Enum;
-using Data.DTOs.SystemAccountDTOs;
+using BusinessLogic.DTOs.SystemAccountDTOs;
 using Data.PaggingItem;
 
 namespace BusinessLogic.Interfaces

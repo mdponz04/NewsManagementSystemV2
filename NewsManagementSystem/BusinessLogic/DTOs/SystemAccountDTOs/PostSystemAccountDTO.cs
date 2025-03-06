@@ -1,6 +1,6 @@
 ﻿using Data.Enum;
 
-namespace Data.DTOs.SystemAccountDTOs
+namespace BusinessLogic.DTOs.SystemAccountDTOs
 {
     public class PostSystemAccountDTO : BaseSystemAccountDTO
     {

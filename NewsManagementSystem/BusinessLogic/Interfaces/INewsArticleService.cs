@@ -1,4 +1,4 @@
-﻿using Data.DTOs.NewsArticleDTOs;
+﻿using BusinessLogic.DTOs.NewsArticleDTOs;
 using Data.PaggingItem;
 namespace BusinessLogic.Interfaces
 {

@@ -1,6 +1,6 @@
 ﻿using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Data.DTOs.SystemAccountDTOs;
+using BusinessLogic.DTOs.SystemAccountDTOs;
 
 namespace NewsManagementSystem.Controllers
 {

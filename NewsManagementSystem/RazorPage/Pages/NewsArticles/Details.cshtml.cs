@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLogic.Interfaces;
-using Data.DTOs.NewsArticleDTOs;
-using Data.DTOs.TagDTOs;
-using Data.DTOs.CategoryDTOs;
+using BusinessLogic.DTOs.NewsArticleDTOs;
+using BusinessLogic.DTOs.TagDTOs;
+using BusinessLogic.DTOs.CategoryDTOs;
 using Microsoft.AspNetCore.Authorization;
 
 namespace RazorPage.Pages.NewsArticles

@@ -4,6 +4,9 @@
 
 @{
     ViewData["Title"] = "Profile";
+    var jwtToken = HttpContext.Session.GetString("jwt_token");
+    var userRole = ViewData["currrentLoggedInUserRole"] as string;
+    string adminRole = "0";
 }
 
 <h1>Profile</h1>
@@ -34,16 +37,15 @@
 </div>
 
 <button type="button" class="btn btn-warning" onclick="loadEditForm(@Model.SystemAccount.AccountId)">Edit</button>
-<a asp-page="./Index" class="btn btn-secondary">Back</a>
 
-@* @if (Model.UserRole!.Equals("0")) // Assuming "0" is admin role
+@if (userRole!.Equals(adminRole))
 {
     <a asp-page="./Index" class="btn btn-secondary">Back</a>
 }
 else
 {
     <a asp-page="/Index" class="btn btn-secondary">Back</a>
-} *@
+}
 
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -59,12 +61,56 @@ else
 </div>
 
 @section Scripts {
+
     <script>
         function loadEditForm(id) {
-            $.get('/SystemAccounts/Edit?id=' + id, function (data) {
-                $('#editFormContainer').html(data);
-                $('#editModal').modal('show');
-            });
+            $.get('/SystemAccounts/Edit/' + id) // Corrected URL
+                .done(function (data) {
+                    $('#editFormContainer').html(data);
+                    $('#editModal').modal('show');
+                })
+                .fail(function () {
+                    alert('Failed to load edit form.');
+                });
         }
+
+        $(document).on('submit', '#editAccountForm', function (event) {
+            event.preventDefault();
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var accountId = $('#AccountId').val();
+
+            var accountData = {
+                AccountId: accountId,
+                AccountName: $('#AccountName').val(),
+                AccountEmail: $('#AccountEmail').val()
+            };
+
+            $.ajax({
+                url: '/SystemAccounts/Edit/' + accountId,
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(accountData),
+                headers: {
+                    'RequestVerificationToken': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $('#editModal').modal('hide');
+
+                        // Update the displayed data on the Profile page
+                        $('.row dd:eq(0)').text(accountData.AccountName); // Update Name
+                        $('.row dd:eq(1)').text(accountData.AccountEmail); // Update Email
+
+                    } else {
+                        alert("Error: " + response.error);
+                    }
+                },
+                error: function (xhr) {
+                    alert("Failed to update account: " + xhr.responseText);
+                }
+            });
+        });
     </script>
 }

@@ -1,5 +1,7 @@
-﻿@{
+﻿@using System.Security.Claims
+@{
     var jwtToken = ViewContext.HttpContext.Session.GetString("jwt_token");
+    string adminRole = "0";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -29,10 +31,29 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Categories/Index">Category</a>
+                            @if (jwtToken != null)
+                            {
+                                @if (User.IsInRole(adminRole) || User.IsInRole("1"))
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/Categories/Index">Category</a>
+                                }
+                            }
                         </li>
-                        <li class="nav-item">
+@*                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Index">User Management</a>
+                        </li> *@
+                        <li class="nav-item">
+                            @if (jwtToken != null)
+                            {
+                                @if (User.IsInRole(adminRole))
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Index">User Management</a>
+                                }
+                                else
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Profile" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
+                                }
+                            }
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/NewsArticles/Index">News Article</a>
@@ -43,9 +64,15 @@
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Tags/Index">Tag</a>
                             </li>
                         }
-                        <li class ="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/ReportStatistic">Report Statistic</a>
-                        </li>
+                        @if (jwtToken != null)
+                        {
+                            @if (User.IsInRole(adminRole))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/ReportStatistic">Report Statistic</a>
+                                </li>
+                            }
+                        }
                         <li class="nav-item">
                             @if (jwtToken == null)
                             {

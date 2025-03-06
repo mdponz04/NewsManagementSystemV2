@@ -4,6 +4,7 @@
 
 @{
     ViewData["Title"] = "Create";
+    Layout = null;
 }
 
 <form method="post" id="createAccountForm">
@@ -27,7 +28,10 @@
         <label asp-for="SystemAccount.ConfirmedPassword">Confirm Password</label>
         <input asp-for="SystemAccount.ConfirmedPassword" type="password" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-success">Create</button>
+    <div class="mt-2">
+        <button type="submit" class="btn btn-success">Create</button>
+        <a class="btn btn-secondary" asp-page="./Index">Back to List</a>
+    </div>
 </form>
 
 <script>
@@ -40,9 +44,7 @@
     });
 </script>
 
-<div>
-    <a class="btn btn-secondary" asp-page="./Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     @{
