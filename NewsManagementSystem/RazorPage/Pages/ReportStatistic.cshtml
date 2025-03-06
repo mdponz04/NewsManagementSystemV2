@@ -6,6 +6,19 @@
 
 <h1>@ViewData["Title"]</h1>
 
+<!-- Date filter form -->
+<form method="get">
+    <div>
+        <label for="fromDate">From Date:</label>
+        <input type="date" id="fromDate" name="FromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div>
+        <label for="toDate">To Date:</label>
+        <input type="date" id="toDate" name="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <button type="submit">Filter</button>
+</form>
+
 <!-- Canvas for the chart -->
 <canvas id="newsChart" width="800" height="400"></canvas>
 
@@ -17,7 +30,7 @@
 
     <script>
         // Convert the server-side report data to JavaScript.
-        // Note: When the page initially loads, the JSON will have PascalCase properties.
+        // When the page initially loads, the JSON will have PascalCase properties.
         var reports = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.NewsCreationReports));
 
         // Create initial labels and counts using the PascalCase properties.
@@ -25,7 +38,8 @@
             var date = new Date(item.Date);
             var day = ("0" + date.getDate()).slice(-2);
             var month = ("0" + (date.getMonth() + 1)).slice(-2);
-            return day + "/" + month;
+            var year = date.getFullYear();
+            return day + "/" + month + "/" + year;
         });
         var counts = reports.map(function (item) {
             return item.Count;
@@ -69,7 +83,8 @@
                 var date = new Date(item.date);
                 var day = ("0" + date.getDate()).slice(-2);
                 var month = ("0" + (date.getMonth() + 1)).slice(-2);
-                return day + "/" + month;
+                var year = date.getFullYear();
+                return day + "/" + month + "/" + year;
             });
             var newCounts = updatedReports.map(function (item) {
                 return item.count;
