@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace RazorPage.Hubs
+namespace BusinessLogic.Hubs
 {
     public class MyHub : Hub
     {
