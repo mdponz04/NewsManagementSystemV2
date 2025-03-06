@@ -1,6 +1,5 @@
 ﻿using BusinessLogic.DTOs.NewsArticleDTOs;
 using Data.PaggingItem;
-
 namespace BusinessLogic.Interfaces
 {
     public interface INewsArticleService
@@ -13,6 +12,8 @@ namespace BusinessLogic.Interfaces
         Task<List<GetNewsArticleDTO>> GetActiveNewsArticle();
         Task<List<GetNewsArticleDTO>> GetNewsArticleAccordingToCreateById(short createById);
         Task<List<GetNewsArticleDTO>> GetNewsArticleBySearchString(string search);
+        Task<List<int>> GetTagIdsByNewsArticleId(string newsArticleId);
+        Task<List<GetNewsArticleDTO>> GetActiveNewsArticleList(List<GetNewsArticleDTO> newsArticleList);
         Task<PaginatedList<GetNewsArticleDTO>> GetNewsArticles(int index, int pageSize, string? idSearch, string? titleSearch, string? headlineSearch);
     }
 }

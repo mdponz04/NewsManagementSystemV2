@@ -9,6 +9,7 @@ namespace RazorPage.Pages.SystemAccounts
     {
         private readonly ISystemAccountService _systemAccountService;
         private readonly IJwtTokenService _jwtTokenService;
+        private const string ADMIN_ROLE = "0";
 
         public DeleteModel(IJwtTokenService jwtTokenService, ISystemAccountService systemAccountService)
         {
@@ -32,6 +33,14 @@ namespace RazorPage.Pages.SystemAccounts
         {
             try
             {
+                var jwtToken = HttpContext.Session.GetString("jwt_token");
+                string userRole = _jwtTokenService.GetRole(jwtToken!);
+
+                if (userRole == null || userRole != ADMIN_ROLE)
+                {
+                    return Forbid();
+                }
+
                 await _systemAccountService.DeleteUserAccountById(id);
                 TempData["SuccessMessage"] = "User deleted successfully!";
                 return RedirectToPage("./Index");

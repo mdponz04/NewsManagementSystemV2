@@ -1,69 +1,11 @@
-﻿@page "/SystemAccounts/Edit"
+﻿@page "/SystemAccounts/Edit/{id:int}" // Route parameter
 @model RazorPage.Pages.SystemAccounts.EditModel
 
 @{
-    ViewData["Title"] = "Edit System Account";
+    ViewData["Title"] = "Edit Account";
+    Layout = null; // Important for partial view in modal
 }
 
-<div class="container mt-4">
-    <div class="card privacy-section">
-        <div class="card-header bg-warning text-white">
-            <h2 class="mb-0">Edit Account</h2>
-        </div>
-        <div class="card-body content">
-            <form method="post" id="editAccountForm">
-                <input type="hidden" asp-for="SystemAccount.AccountId" />
-
-                <div class="form-group mb-3">
-                    <label asp-for="SystemAccount.AccountName" class="form-label fw-bold"></label>
-                    <input asp-for="SystemAccount.AccountName" class="form-control" placeholder="Enter account name" />
-                    <span asp-validation-for="SystemAccount.AccountName" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="SystemAccount.AccountEmail" class="form-label fw-bold"></label>
-                    <input asp-for="SystemAccount.AccountEmail" class="form-control" placeholder="Enter email address" />
-                    <span asp-validation-for="SystemAccount.AccountEmail" class="text-danger"></span>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-warning fw-bold px-4">Update</button>
-                    <a class="btn btn-secondary fw-bold px-4" asp-page="./Index">Back to List</a>
-                </div>
-            </form>
-        </div>
-    </div>
+<div id="editFormContainer">
+    @await Html.PartialAsync("_EditSystemAccountPartial", Model.SystemAccountDto)
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        $(document).ready(function () {
-            $('#editAccountForm').on('submit', function (event) {
-                event.preventDefault();
-
-                // Check if the form is valid
-                if ($(this).valid()) {
-                    $.ajax({
-                        url: '/SystemAccounts/Edit',
-                        method: 'POST',
-                        data: $(this).serialize(),
-                        success: function (response) {
-                            if (response.success) {
-                                // If modal is used
-                                $('#editModal').modal('hide');
-                                // Reload or redirect as needed
-                                window.location.href = '/SystemAccounts/Index';
-                            } else {
-                                alert('Update failed: ' + (response.message || 'Unknown error'));
-                            }
-                        },
-                        error: function () {
-                            alert('An error occurred while updating the account.');
-                        }
-                    });
-                }
-            });
-        });
-    </script>
-}

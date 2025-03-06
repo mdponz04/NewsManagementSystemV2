@@ -22,27 +22,32 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<List<GetTagDTO>> GetAllTag()
-        {
-            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
-            IEnumerable<Tag> tags = await repository.GetAllAsync();
-            return _mapper.Map<List<GetTagDTO>>(tags);
-        }
-
         public async Task<GetTagDTO> GetTagById(int id)
         {
+            
             IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            
             Tag? tag = await repository.GetByIdAsync(id);
+            if(tag == null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "Tag not found!");
+            }
             return _mapper.Map<GetTagDTO>(tag);
         }
 
-        public async Task<int> CreateTag(PostTagDTO tag)
+        public async Task CreateTag(PostTagDTO tag)
         {
             IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
             Tag newTag = _mapper.Map<Tag>(tag);
+            newTag.TagId = await AutoIncrementId();
+            //Check if tag name exists
+            if (await repository.Entities.AnyAsync(t=> t.TagName == newTag.TagName))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Tag name already exists!");
+            }
+
             await repository.InsertAsync(newTag);
             await _unitOfWork.SaveAsync();
-            return newTag.TagId;
         }
 
         public async Task UpdateTag(PutTagDTO updatedTag)
@@ -56,9 +61,14 @@ namespace BusinessLogic.Services
             // Update properties
             _mapper.Map(updatedTag, existingTag);
 
-            /*existingTag.TagName = updatedTag.TagName;
-            existingTag.Note = updatedTag.Note;*/
-            // Update other properties as needed
+            //Check if tag name exists
+            if (await repository
+                .Entities
+                .AnyAsync(t => t.TagName == existingTag.TagName && t.TagId != existingTag.TagId))
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Tag name already exists!");
+            }
+
             repository.Update(existingTag);
             await _unitOfWork.SaveAsync();
         }
@@ -82,6 +92,23 @@ namespace BusinessLogic.Services
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "Tag not found!");
             }
         }
+        private async Task<int> AutoIncrementId()
+        {
+            var latestTag = await _unitOfWork
+                .GetRepository<NewsTag>()
+                .Entities
+                .OrderByDescending(t => t.TagId)
+                .FirstOrDefaultAsync();
+
+            return (latestTag?.TagId ?? 0) + 1;
+        }
+        //NewsManagement methods
+        public async Task<List<GetTagDTO>> GetAllTag()
+        {
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            IEnumerable<Tag> tags = await repository.GetAllAsync();
+            return _mapper.Map<List<GetTagDTO>>(tags);
+        }
         public async Task<List<Tag>> GetListTagByIdEntityType(List<int> ids)
         {
             IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
@@ -101,6 +128,25 @@ namespace BusinessLogic.Services
             }
             return tags;
         }
+        public async Task<List<GetTagDTO>> GetListTag(List<int> tagIds)
+        {
+            IGenericRepository<Tag> repository = _unitOfWork.GetRepository<Tag>();
+            List<Tag> tags = new List<Tag>();
+            foreach (int id in tagIds)
+            {
+                Tag? tag = await repository.GetByIdAsync(id);
+                if (tag == null)
+                {
+                    throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, $"This tag id: {id} is not found!");
+                }
+                else
+                {
+                    tags.Add(tag);
+                }
+            }
+            return _mapper.Map<List<GetTagDTO>>(tags);
+        }
+        //True == in use
         private async Task<bool> CheckIsTagInUseByTagId(int id)
         {
             NewsTag? newsTag = await _unitOfWork
@@ -126,13 +172,13 @@ namespace BusinessLogic.Services
                 query = query.Where(u => u.TagId == idSearch);
             }
 
-            // Search by user name
+            // Search by Tag name
             if (!string.IsNullOrWhiteSpace(nameSearch))
             {
                 query = query.Where(u => u.TagName!.Contains(nameSearch));
             }
 
-            // Search by email
+            // Search by note
             if (!string.IsNullOrWhiteSpace(noteSearch))
             {
                 query = query.Where(u => u.Note!.Equals(noteSearch));

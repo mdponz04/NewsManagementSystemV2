@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Data.Entities;
 using BusinessLogic.DTOs.SystemAccountDTOs;
 using Data.PaggingItem;
 using BusinessLogic.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Data.Enum;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace RazorPage.Pages.SystemAccounts
 {
@@ -12,6 +12,7 @@ namespace RazorPage.Pages.SystemAccounts
     {
         private readonly ISystemAccountService _systemAccountService;
         private readonly IJwtTokenService _jwtTokenService;
+        private const string ADMIN_ROLE = "0";
 
         public IndexModel(IJwtTokenService jwtTokenService, ISystemAccountService systemAccountService)
         {
@@ -19,18 +20,30 @@ namespace RazorPage.Pages.SystemAccounts
             _systemAccountService = systemAccountService;
         }
 
-        public PaginatedList<GetSystemAccountDTO> SystemAccounts { get; set; } = default!;
+        public PaginatedList<GetSystemAccountDTO> SystemAccountsList { get; set; } = default!;
 
-        // GET: Get and Search SystemAccounts
-        public async Task OnGetAsync(int pageNumber = 1, int pageSize = 3, string? searchNameString = null, string? searchEmailString = null, string? searchRoleString = null)
+
+        // GET: Get and Search SystemAccounts
+        public async Task<IActionResult> OnGetAsync(int pageNumber = 1, int pageSize = 3, string? searchNameString = null, string? searchEmailString = null, string? searchRoleString = null)
         {
+            var jwtToken = HttpContext.Session.GetString("jwt_token");
+            string userRole = _jwtTokenService.GetRole(jwtToken!);
+
+            if (userRole == null || userRole != ADMIN_ROLE)
+            {
+                return Forbid();
+            }
+
             EnumRole? roleFilter = null;
+
             if (!string.IsNullOrEmpty(searchRoleString) && Enum.TryParse(searchRoleString, out EnumRole parsedRole))
             {
                 roleFilter = parsedRole;
             }
-            // Fetch paginated search categories
-            SystemAccounts = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchNameString, searchEmailString, roleFilter);
+            // Fetch paginated search categories
+            SystemAccountsList = await _systemAccountService.GetUserAccounts(pageNumber, pageSize, null, searchNameString, searchEmailString, roleFilter);
+
+            return Page();
         }
     }
 }

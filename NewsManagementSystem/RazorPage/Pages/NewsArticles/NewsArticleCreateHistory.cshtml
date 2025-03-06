@@ -1,25 +1,13 @@
 ﻿@page
-@model RazorPage.Pages.NewsArticles.IndexModel
-
+@model RazorPage.Pages.NewsArticles.NewsArticleCreateHistoryModel
 @{
-    ViewData["Title"] = "Index";
 }
 
-
-<h1>Index</h1>
-<form asp-action="Index" method="get" class="mb-3">
-    <input type="text" name="searchString" placeholder="Search..." class="form-control" />
-    <button type="submit" class="btn btn-primary mt-2">Search</button>
-</form>
+<h1>Create history</h1>
+<
 
 <p>
-    
-    @if (User.IsInRole("1"))
-    {
-        <a asp-page="Create">Create New</a>
-        <br />
-        <a asp-page="NewsArticleCreateHistory">View history of created news article</a>
-    }
+    <a asp-page="Create">Create New</a><br />
 </p>
 <table class="table">
     <thead>

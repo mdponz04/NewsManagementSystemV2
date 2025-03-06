@@ -36,10 +36,5 @@ namespace RazorPage.Pages
         }
     }
 
-    // DTO for report data
-    public class NewsCreationReport
-    {
-        public DateTime Date { get; set; }
-        public int Count { get; set; }
-    }
+
 }

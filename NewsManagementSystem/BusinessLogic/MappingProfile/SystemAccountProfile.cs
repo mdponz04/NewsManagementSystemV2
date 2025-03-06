@@ -11,6 +11,7 @@ namespace BusinessLogic.MappingProfile
             CreateMap<SystemAccount, GetSystemAccountDTO>().ReverseMap();
             CreateMap<SystemAccount, PostSystemAccountDTO>().ReverseMap();
             CreateMap<SystemAccount, PutSystemAccountDTO>().ReverseMap();
+            CreateMap<GetSystemAccountDTO, PutSystemAccountDTO>().ReverseMap();
         }
     }
 }

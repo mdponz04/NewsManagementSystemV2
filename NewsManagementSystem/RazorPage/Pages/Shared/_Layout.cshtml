@@ -1,225 +1,105 @@
-﻿@{
+﻿@using System.Security.Claims
+@{
     var jwtToken = ViewContext.HttpContext.Session.GetString("jwt_token");
-    // Check if the current page is the homepage (e.g., /Index or root)
-    var isHomePage = Context.Request.Path == "/" || Context.Request.Path == "/Index";
+    string adminRole = "0";
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - NewsManagement</title>
+    <title>@ViewData["Title"] - RazorPage</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/RazorPage.styles.css" asp-append-version="true" />
-    <style>
-        :root {
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --background-color: #f4f6f9;
-            --text-color: #2c3e50;
-        }
-
-        body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            background-color: white !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 0.75rem 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            letter-spacing: -0.5px;
-        }
-
-        .navbar-nav .nav-link {
-            color: var(--text-color);
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-            .navbar-nav .nav-link:hover {
-                color: var(--primary-color);
-            }
-
-        .btn-menu {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-            .btn-menu:hover {
-                background-color: #0056b3;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            }
-
-        .modal-content {
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: none;
-        }
-
-        .modal-header {
-            background-color: var(--primary-color);
-            color: white;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
-
-        .modal-title {
-            font-weight: 700;
-        }
-
-        .list-group-item {
-            border: none;
-            transition: background-color 0.3s ease;
-            margin-bottom: 5px;
-        }
-
-            .list-group-item:hover {
-                background-color: #f8f9fa;
-            }
-
-            .list-group-item a {
-                color: var(--text-color);
-                font-weight: 600;
-                text-decoration: none;
-            }
-
-                .list-group-item a:hover {
-                    color: var(--primary-color);
-                }
-
-        .btn-logout {
-            color: #dc3545;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-            .btn-logout:hover {
-                color: #a71d2a;
-                text-decoration: underline;
-            }
-
-        footer {
-            background-color: white;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
-            padding: 1rem 0;
-            width: 100%;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .privacy-section {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: relative;
-        }
-
-            .privacy-section img {
-                position: absolute;
-                inset: 0;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                opacity: 0.2;
-            }
-
-            .privacy-section .content {
-                position: relative;
-                z-index: 10;
-            }
-    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">NewsManagement</a>
+                <a class="navbar-brand" asp-area="" asp-page="/Index">RazorPage</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <!-- Optional: Add navigation items here if needed -->
-                    </ul>
-                    <button class="btn btn-menu" data-bs-toggle="modal" data-bs-target="#menuModal">
-                        <i class="bi bi-list me-2"></i>Menu
-                    </button>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Modal -->
-    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="menuModalLabel">Navigation Menu</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <ul class="list-group">
-                        <li class="list-group-item"><a asp-area="" asp-page="/Privacy">Privacy</a></li>
-                        <li class="list-group-item"><a asp-area="" asp-page="/Categories/Index">Category</a></li>
-                        <li class="list-group-item"><a asp-area="" asp-page="/SystemAccounts/Index">User Management</a></li>
-                        <li class="list-group-item"><a asp-area="" asp-page="/NewsArticles/Index">News Article</a></li>
-                        <li class="list-group-item"><a asp-area="" asp-page="/Tags/Index">Tag</a></li>
-                        <li class="list-group-item"><a asp-area="" asp-page="/ReportStatistic">Report Statistic</a></li>
-                        <li class="list-group-item">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            @if (jwtToken != null)
+                            {
+                                @if (User.IsInRole(adminRole) || User.IsInRole("1"))
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/Categories/Index">Category</a>
+                                }
+                            }
+                        </li>
+@*                         <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Index">User Management</a>
+                        </li> *@
+                        <li class="nav-item">
+                            @if (jwtToken != null)
+                            {
+                                @if (User.IsInRole(adminRole))
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Index">User Management</a>
+                                }
+                                else
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Profile" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
+                                }
+                            }
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/NewsArticles/Index">News Article</a>
+                        </li>
+                        @if(User.IsInRole("1"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Tags/Index">Tag</a>
+                            </li>
+                        }
+                        <li class ="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/ReportStatistic">Report Statistic</a>
+                        </li>
+                        <li class="nav-item">
                             @if (jwtToken == null)
                             {
-                                <a asp-area="" asp-page="/Login">Login</a>
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Login">Login</a>
                             }
                             else
                             {
                                 <form method="post" asp-area="" asp-page="/Logout" class="d-inline">
-                                    <button type="submit" class="btn btn-link btn-logout" style="padding: 0; border: none;">Logout</button>
+                                    <button type="submit" class="btn btn-link nav-link text-dark" style="padding: 0; border: none;">Logout</button>
                                 </form>
                             }
                         </li>
                     </ul>
                 </div>
             </div>
-        </div>
-    </div>
-
+        </nav>
+    </header>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    @if (isHomePage)
-    {
-        <footer class="border-top footer">
-            <div class="container text-center d-flex justify-content-center align-items-center">
-                © 2025 - NewsManagement - <a asp-area="" asp-page="/Privacy">Privacy</a>
-            </div>
-        </footer>
-    }
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - RazorPage - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

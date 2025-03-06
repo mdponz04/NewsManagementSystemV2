@@ -3,63 +3,114 @@
 @using System.Security.Claims
 
 @{
-    ViewData["Title"] = "Account Profile";
+    ViewData["Title"] = "Profile";
+    var jwtToken = HttpContext.Session.GetString("jwt_token");
+    var userRole = ViewData["currrentLoggedInUserRole"] as string;
+    string adminRole = "0";
 }
 
-<div class="container mt-4">
-    <div class="card privacy-section">
-        <div class="card-header bg-primary text-white">
-            <h2 class="mb-0">Account Profile</h2>
-        </div>
-        <div class="card-body content">
-            <h4 class="fw-bold text-muted mb-3">System Account Details</h4>
-            <hr class="my-4" />
-            <dl class="row mb-0">
-                <dt class="col-sm-3 fw-bold text-muted">Name</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.SystemAccount.AccountName)</dd>
+<h1>Profile</h1>
 
-                <dt class="col-sm-3 fw-bold text-muted">Email</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.SystemAccount.AccountEmail)</dd>
-
-                <dt class="col-sm-3 fw-bold text-muted">Role</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.SystemAccount.RoleName)</dd>
-            </dl>
-        </div>
-        <div class="card-footer bg-light d-flex justify-content-between">
-            <button type="button" class="btn btn-warning fw-bold px-4" onclick="loadEditForm(@Model.SystemAccount.AccountId)">
-                <i class="bi bi-pencil-square me-2"></i>Edit
-            </button>
-            <a asp-page="./Index" class="btn btn-secondary fw-bold px-4">
-                <i class="bi bi-arrow-left me-2"></i>Back to List
-            </a>
-        </div>
-    </div>
+<div>
+    <h4>SystemAccount</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Name
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SystemAccount.AccountName)
+        </dd>
+        <dt class="col-sm-2">
+            Email
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SystemAccount.AccountEmail)
+        </dd>
+        <dt class="col-sm-2">
+            Role
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SystemAccount.RoleName)
+        </dd>
+    </dl>
 </div>
 
-<!-- Edit Modal -->
+<button type="button" class="btn btn-warning" onclick="loadEditForm(@Model.SystemAccount.AccountId)">Edit</button>
+
+@if (userRole!.Equals(adminRole))
+{
+    <a asp-page="./Index" class="btn btn-secondary">Back</a>
+}
+else
+{
+    <a asp-page="/Index" class="btn btn-secondary">Back</a>
+}
+
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title fw-bold" id="editModalLabel">Edit Account</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="editFormContainer">
-                <!-- Edit form will be loaded here -->
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+
     <script>
         function loadEditForm(id) {
-            $.get('/SystemAccounts/Edit?id=' + id, function (data) {
-                $('#editFormContainer').html(data);
-                $('#editModal').modal('show');
-            }).fail(function () {
-                alert('Failed to load the edit form. Please try again.');
-            });
+            $.get('/SystemAccounts/Edit/' + id) // Corrected URL
+                .done(function (data) {
+                    $('#editFormContainer').html(data);
+                    $('#editModal').modal('show');
+                })
+                .fail(function () {
+                    alert('Failed to load edit form.');
+                });
         }
+
+        $(document).on('submit', '#editAccountForm', function (event) {
+            event.preventDefault();
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var accountId = $('#AccountId').val();
+
+            var accountData = {
+                AccountId: accountId,
+                AccountName: $('#AccountName').val(),
+                AccountEmail: $('#AccountEmail').val()
+            };
+
+            $.ajax({
+                url: '/SystemAccounts/Edit/' + accountId,
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(accountData),
+                headers: {
+                    'RequestVerificationToken': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $('#editModal').modal('hide');
+
+                        // Update the displayed data on the Profile page
+                        $('.row dd:eq(0)').text(accountData.AccountName); // Update Name
+                        $('.row dd:eq(1)').text(accountData.AccountEmail); // Update Email
+
+                    } else {
+                        alert("Error: " + response.error);
+                    }
+                },
+                error: function (xhr) {
+                    alert("Failed to update account: " + xhr.responseText);
+                }
+            });
+        });
     </script>
 }
