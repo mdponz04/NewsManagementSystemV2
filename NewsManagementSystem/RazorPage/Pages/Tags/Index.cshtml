@@ -1,51 +1,289 @@
 ﻿@page
 @model RazorPage.Pages.Tags.IndexModel
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Tags";
 }
 
-<h1>Index</h1>
-@* <form asp-action="Index" method="get" class="mb-3">
-    <input type="text" name="searchString" placeholder="Search..." class="form-control" />
-    <button type="submit" class="btn btn-primary mt-2">Search</button>
-</form> *@
+<!-- Necessary Libraries -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>
-                Name
-            </th>
-            <th>
-                Note
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            int count = 1; // Start counting from 1
+<style>
+    :root {
+        --primary-color: #1a73e8;
+        --secondary-color: #5f6368;
+        --light-bg: #f8fafc;
+        --text-color: #202124;
+        --shadow-color: rgba(0, 0, 0, 0.15);
+        --gradient-start: #1a73e8;
+        --gradient-end: #34c759;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, var(--light-bg), #e9ecef);
+        color: var(--text-color);
+        min-height: 100vh;
+    }
+
+    /* Card Styling */
+    .card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 6px 20px var(--shadow-color);
+        background: #fff;
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 30px var(--shadow-color);
+    }
+
+    /* Header Styling */
+    .header {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: #fff;
+        padding: 2rem;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: rotate(30deg);
+        pointer-events: none;
+        animation: shimmer 6s infinite;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Search Container */
+    .search-container {
+        background: #fff;
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        box-shadow: 0 4px 15px var(--shadow-color);
+        transition: all 0.3s ease;
+    }
+
+    .search-container:hover {
+        box-shadow: 0 6px 20px var(--shadow-color);
+        transform: scale(1.02);
+    }
+
+    .form-control {
+        border: none;
+        box-shadow: none;
+        font-size: 1rem;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    /* Table Styling */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: #fff;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border: none;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .table tbody tr {
+        background: #fff;
+        box-shadow: 0 4px 12px var(--shadow-color);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease-in-out;
+    }
+
+    .table tbody tr:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px var(--shadow-color);
+    }
+
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border: none;
+        color: var(--text-color);
+    }
+
+    .table td a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .table td a:hover {
+        color: var(--gradient-end);
+    }
+
+    /* Button Styling */
+    .btn-modern {
+        border-radius: 30px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.4s ease;
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px var(--shadow-color);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        border: none;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1557b0, #28a745);
+    }
+
+    /* Animations */
+    keyframes shimmer {
+        0% { transform: translateX(-100%) rotate(30deg); }
+        50% { transform: translateX(100%) rotate(30deg); }
+        100% { transform: translateX(100%) rotate(30deg); }
+    }
+
+    keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive Adjustments */
+    media (max-width: 768px) {
+        .header h1 {
+            font-size: 1.5rem;
         }
-        @foreach (var item in Model.Tags)
-        {
-            <tr>
-                <td>@count</td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TagName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Note)
-                </td>
-                <td>
-                    <a asp-page="Edit" asp-route-id="@item.TagId">Edit</a> |
-                    <a asp-page="Details" asp-route-id="@item.TagId">Details</a> |
-                </td>
-            </tr>
-            count++;
+
+        .btn-modern {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
         }
-    </tbody>
-</table>
+
+        .table td, .table th {
+            font-size: 0.9rem;
+            padding: 0.75rem;
+        }
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    <div class="card animate__animated animate__fadeIn">
+        <div class="header">
+            <h1>Tags</h1>
+            <a asp-page="./Create" class="btn btn-primary btn-modern">
+                <i class="bi bi-plus-lg"></i> Create New
+            </a>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Uncomment and style the search form if needed -->
+            @* <div class="search-container mb-4 animate__animated animate__fadeInUp">
+                <form asp-page="./Index" method="get" class="d-flex align-items-center">
+                    <div class="input-group flex-grow-1">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="searchString" placeholder="Search tags..." class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-modern ms-3">
+                        <i class="bi bi-arrow-right"></i> Search
+                    </button>
+                </form>
+            </div> *@
+
+            @if (Model.Tags != null && Model.Tags.Any())
+            {
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Note</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int count = 1;
+                            }
+                            @foreach (var item in Model.Tags)
+                            {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@Html.DisplayFor(modelItem => item.TagName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Note)</td>
+                                    <td>
+                                        <a asp-page="./Edit" asp-route-id="@item.TagId" class="btn btn-outline-warning btn-sm btn-modern">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <a asp-page="./Details" asp-route-id="@item.TagId" class="btn btn-outline-info btn-sm btn-modern">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                                count++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 animate__animated animate__fadeIn">
+                    <p class="text-muted">No tags found.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -2,75 +2,269 @@
 @model RazorPage.Pages.NewsArticles.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "News Articles";
 }
 
+<!-- Necessary Libraries -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-<h1>Index</h1>
-<form asp-action="Index" method="get" class="mb-3">
-    <input type="text" name="searchString" placeholder="Search..." class="form-control" />
-    <button type="submit" class="btn btn-primary mt-2">Search</button>
-</form>
-
-<p>
-    
-    @if (User.IsInRole("1"))
-    {
-        <a asp-page="Create">Create New</a>
-        <br />
-        <a asp-page="NewsArticleCreateHistory">View history of created news article</a>
+<style>
+    :root {
+        --primary-color: #1a73e8;
+        --secondary-color: #5f6368;
+        --light-bg: #f8fafc;
+        --text-color: #202124;
+        --shadow-color: rgba(0, 0, 0, 0.15);
+        --gradient-start: #1a73e8;
+        --gradient-end: #34c759;
     }
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                News title
-            </th>
-            <th>
-                Headline
-            </th>
-            <th>
-                News content
-            </th>
-            <th>
-                News source
-            </th>
-            <th>
-                Created date
-            </th>
-            <th>
-                Modified date
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.NewsArticles)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NewsTitle)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Headline)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NewsContent)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NewsSource)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ModifyDate)
-                </td>
-                <td>
-                    <a asp-page="Details" asp-route-id="@item.NewsArticleId">Details</a>
-                </td>
-            </tr>
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, var(--light-bg), #e9ecef);
+        color: var(--text-color);
+        min-height: 100vh;
+    }
+
+    .card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 6px 20px var(--shadow-color);
+        background: #fff;
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 30px var(--shadow-color);
+    }
+
+    .header {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: #fff;
+        padding: 2rem;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: rotate(30deg);
+        pointer-events: none;
+        animation: shimmer 6s infinite;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-container {
+        background: #fff;
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        box-shadow: 0 4px 15px var(--shadow-color);
+        transition: all 0.3s ease;
+    }
+
+    .search-container:hover {
+        box-shadow: 0 6px 20px var(--shadow-color);
+        transform: scale(1.02);
+    }
+
+    .form-control {
+        border: none;
+        box-shadow: none;
+        font-size: 1rem;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-modern {
+        border-radius: 30px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.4s ease;
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px var(--shadow-color);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        border: none;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1557b0, #28a745);
+    }
+
+    .btn-light {
+        background: #fff;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    .btn-light:hover {
+        background: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+    }
+
+    .item-card {
+        background: #fff;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px var(--shadow-color);
+        transition: all 0.4s ease;
+        animation: fadeInUp 0.5s ease-in-out;
+    }
+
+    .item-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 25px var(--shadow-color);
+    }
+
+    .item-card h6 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color 0.3s ease;
+    }
+
+    .item-card:hover h6 {
+        color: var(--gradient-end);
+    }
+
+    .item-card small {
+        color: var(--secondary-color);
+        font-size: 0.9rem;
+    }
+
+    keyframes shimmer {
+        0% { transform: translateX(-100%) rotate(30deg); }
+        50% { transform: translateX(100%) rotate(30deg); }
+        100% { transform: translateX(100%) rotate(30deg); }
+    }
+
+    keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+
+
+media (max-width: 768px) {
+        .header h1 {
+            font-size: 1.5rem;
         }
-    </tbody>
-</table>
+
+        .item-card {
+            padding: 1rem;
+        }
+
+        .btn-modern {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    <div class="card animate__animated animate__fadeIn">
+        <div class="header">
+            <h1>News Articles</h1>
+            <div>
+                <a asp-page="./Create" class="btn btn-light btn-modern btn-sm me-2">
+                    <i class="bi bi-plus-lg"></i> New
+                </a>
+                <a asp-page="./CreatedNewsArticleHistory" class="btn btn-light btn-modern btn-sm">
+                    <i class="bi bi-clock-history"></i> History
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="search-container mb-4 animate__animated animate__fadeInUp">
+                <form asp-page="./Search" method="get" class="d-flex align-items-center">
+                    <div class="input-group flex-grow-1">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="searchString" name="searchString" placeholder="Search news articles..." class="form-control" />
+                    </div>
+                    <input type="hidden" id="pageNumber" name="pageNumber" min="1" value="1">
+                    <button type="submit" class="btn btn-primary btn-modern ms-3">
+                        <i class="bi bi-arrow-right"></i> Search
+                    </button>
+                </form>
+            </div>
+
+            <div class="row g-4">
+                @if (Model.NewsArticles != null && Model.NewsArticles.Any())
+                {
+                    @foreach (var item in Model.NewsArticles)
+                    {
+                        <div class="col-md-4 col-sm-6">
+                            <div class="item-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6>@item.NewsTitle</h6>
+                                    <div class="btn-group">
+                                        <a asp-page="./Edit" asp-route-id="@item.NewsArticleId" class="btn btn-outline-warning btn-sm btn-modern">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-page="./Details" asp-route-id="@item.NewsArticleId" class="btn btn-outline-info btn-sm btn-modern">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-page="./Delete" asp-route-id="@item.NewsArticleId" class="btn btn-outline-danger btn-sm btn-modern">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <small>@item.NewsSource</small><br />
+                                <small>@item.CreatedDate</small>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center py-4 animate__animated animate__fadeIn">
+                        <p class="text-muted">No articles found.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
