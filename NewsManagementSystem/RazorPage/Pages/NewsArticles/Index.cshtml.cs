@@ -1,7 +1,6 @@
 using BusinessLogic.Interfaces;
 using BusinessLogic.DTOs.NewsArticleDTOs;
-using Data.PaggingItem;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RazorPage.Pages.NewsArticles
@@ -9,34 +8,43 @@ namespace RazorPage.Pages.NewsArticles
     public class IndexModel : PageModel
     {
         private readonly INewsArticleService _newsArticleService;
-        private readonly ITagService _tagService;
-        private readonly ICategoryService _categoryService;
-        private readonly INewsTagService _newsTagService;
         private readonly IJwtTokenService _jwtTokenService;
-        public IndexModel(
-            ICategoryService categoryService
-            , ITagService tagService
-            , INewsArticleService newsArticleService
-            , INewsTagService newsTagService
-            , IJwtTokenService jwtTokenService)
+        public IndexModel(INewsArticleService newsArticleService, IJwtTokenService jwtTokenService)
         {
-            _categoryService = categoryService;
-            _tagService = tagService;
             _newsArticleService = newsArticleService;
-            _newsTagService = newsTagService;
             _jwtTokenService = jwtTokenService;
         }
 
-        public PaginatedList<GetNewsArticleDTO> NewsArticles { get; set; }
-
-        public async Task OnGetAsync(int pageNumber = 1, int pageSize = 3, string? searchString = null)
+        public List<GetNewsArticleDTO> NewsArticles { get; set; }
+        [AllowAnonymous]
+        public async Task OnGetAsync(string? searchString)
         {
-            if(searchString != null)
+            short? role;
+            string? jwtTokenFromSession = HttpContext.Session.GetString("jwt_token");
+            if(jwtTokenFromSession == null)
             {
-                searchString = searchString.Trim();
+                role = null;
             }
-            // Fetch paginated search categories
-            NewsArticles = await _newsArticleService.GetNewsArticles(pageNumber, pageSize, null, searchString, null);
+            else
+            {
+                role = short.Parse(_jwtTokenService.GetRole(jwtTokenFromSession));
+            }
+
+            if (searchString != null)
+            {
+                NewsArticles = await _newsArticleService.GetNewsArticleBySearchString(searchString);
+            }
+            else
+            {
+                NewsArticles = await _newsArticleService.GetAllNewsArticle();
+            }
+
+            if (role == 2 || role == null)
+            {
+                NewsArticles = await _newsArticleService.GetActiveNewsArticleList(NewsArticles);
+            }
+
+            return;
         }
 
     }

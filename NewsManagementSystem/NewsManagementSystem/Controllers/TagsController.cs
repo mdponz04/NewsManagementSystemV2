@@ -54,8 +54,8 @@ namespace NewsManagementSystem.Controllers
         public async Task<IActionResult> Create(PostTagDTO tag)
         {
             
-            int id = await _tagService.CreateTag(tag);
-            return RedirectToAction(nameof(Details), new { id });
+            await _tagService.CreateTag(tag);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Tags/Edit/5
