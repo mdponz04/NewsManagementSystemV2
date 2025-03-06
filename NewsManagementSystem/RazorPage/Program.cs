@@ -65,7 +65,7 @@ namespace RazorPage
             app.UseStaticFiles();
             app.UseMiddleware<CustomExceptionHandlerMiddleware>();
             app.UseMiddleware<JwtTokenMiddleware>();  // JWT middleware
-         //   app.MapGet("/", () => Results.Redirect("/Auth/Login"));
+            app.MapGet("/", () => Results.Redirect("/Login"));
 
             app.UseRouting();
             app.UseAuthentication();
