@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLogic.Interfaces;
 using Data.DTOs.TagDTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RazorPage.Pages.Tags
 {
@@ -13,12 +14,13 @@ namespace RazorPage.Pages.Tags
         {
             _service = service;
         }
-
+        [Authorize(Roles ="1")]
         public IActionResult OnGet()
         {
             return Page();
         }
         public PostTagDTO Tag { get; set; } = default!;
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> OnPostAsync([FromForm] PostTagDTO tag)
         {
             Tag = tag;

@@ -1,6 +1,7 @@
 using BusinessLogic.Interfaces;
 using Data.DTOs.TagDTOs;
 using Data.PaggingItem;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RazorPage.Pages.Tags
@@ -14,7 +15,7 @@ namespace RazorPage.Pages.Tags
         {
             _tagService = tagService;
         }
-
+        [Authorize(Roles = "1")]
         // GET: Get and Search Tag
         public async Task OnGetAsync()
         {

@@ -174,6 +174,19 @@ namespace BusinessLogic.Services
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.BADREQUEST, "News article not found!");
             }
         }
+        public async Task<List<GetNewsArticleDTO>> GetActiveNewsArticleList(List<GetNewsArticleDTO> newsArticleList)
+        {
+            List<GetNewsArticleDTO> activeNewsArticleList = new();
+            foreach (GetNewsArticleDTO newsArticle in newsArticleList)
+            {
+                if (newsArticle.NewsStatus == true)
+                {
+                    activeNewsArticleList.Add(newsArticle);
+                }
+            }
+
+            return activeNewsArticleList;
+        }
         //na = news article
         public async Task<List<GetNewsArticleDTO>> GetActiveNewsArticle()
         {

@@ -4,6 +4,7 @@ using BusinessLogic.Interfaces;
 using Data.DTOs.NewsArticleDTOs;
 using Data.DTOs.CategoryDTOs;
 using Data.DTOs.TagDTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RazorPage.Pages.NewsArticles
 {
@@ -24,7 +25,7 @@ namespace RazorPage.Pages.NewsArticles
         public GetNewsArticleDTO NewsArticle { get; set; } = default!;
         public GetCategoryDTO Category { get; set; } = default!;
         public List<GetTagDTO> Tags { get; set; } = default!;
-
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> OnGetAsync(string id)
         {
             if (id == null)
@@ -36,7 +37,7 @@ namespace RazorPage.Pages.NewsArticles
             Tags = await _tagService.GetListTag(await _newsArticleService.GetTagIdsByNewsArticleId(id));
             return Page();
         }
-
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> OnPostAsync(string id)
         {
             await _newsArticleService.DeleteNewsArticle(id);
