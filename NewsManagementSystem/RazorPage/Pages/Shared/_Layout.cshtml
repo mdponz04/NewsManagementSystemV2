@@ -2,6 +2,8 @@
 @{
     var jwtToken = ViewContext.HttpContext.Session.GetString("jwt_token");
     string adminRole = "0";
+    string staffRole = "1";
+    string lecturerRole = "2";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -30,49 +32,60 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>
-                        <li class="nav-item">
-                            @if (jwtToken != null)
-                            {
-                                @if (User.IsInRole(adminRole) || User.IsInRole("1"))
-                                {
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Categories/Index">Category</a>
-                                }
-                            }
-                        </li>
-@*                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Index">User Management</a>
-                        </li> *@
-                        <li class="nav-item">
-                            @if (jwtToken != null)
-                            {
-                                @if (User.IsInRole(adminRole))
-                                {
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Index">User Management</a>
-                                }
-                                else
-                                {
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Profile" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
-                                }
-                            }
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/NewsArticles/Index">News Article</a>
-                        </li>
-                        @if(User.IsInRole("1"))
+
+                        @* Category Management is available for Admin (0) and Staff (1) *@
+                        @if (jwtToken != null && (User.IsInRole(adminRole) || User.IsInRole(staffRole)))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Tags/Index">Tag</a>
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Categories/Index">Category Management</a>
                             </li>
                         }
+
+                        @* Account Management for Admin; non-admin (Staff or Lecturer) gets Profile link *@
                         @if (jwtToken != null)
                         {
-                            @if (User.IsInRole(adminRole))
+                            if (User.IsInRole(adminRole))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/ReportStatistic">Report Statistic</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Index">Account Management</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/SystemAccounts/Profile"
+                                       asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Profile</a>
                                 </li>
                             }
                         }
+
+                        @* News Articles page is publicly accessible. *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/NewsArticles/Index">News Articles</a>
+                        </li>
+
+                        @* Additional management options for Staff (role "1") *@
+                        @if (jwtToken != null && User.IsInRole(staffRole))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/NewsArticles/Manage">Manage News</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/NewsArticles/History">News History</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Tags/Index">Tag Management</a>
+                            </li>
+                        }
+
+                        @* Report Statistic is available for Admin *@
+                        @if (jwtToken != null && User.IsInRole(adminRole))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/ReportStatistic">Report Statistic</a>
+                            </li>
+                        }
+
                         <li class="nav-item">
                             @if (jwtToken == null)
                             {
@@ -95,13 +108,13 @@
             @RenderBody()
         </main>
     </div>
-
+    
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2025 - RazorPage - <a asp-area="" asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
-
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
